@@ -1,10 +1,11 @@
 use std::fs;
 use std::fs::File;
-use std::io::{BufRead, Error, BufReader};
+use std::io::{BufRead, BufReader};
 use std::cmp::Ordering;
+use std::error::Error;
 
 /// Verify that files have headers according to the templates.
-pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
     println!(
         "checking headers of `{}` with templates `{}`",
         files.join(", "),
@@ -23,7 +24,7 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
     Ok(true)
 }
 
-fn get_template_lines(path: &str) -> Result<Vec<String>, Error> {
+fn get_template_lines(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let content = fs::read_to_string(path)?;
     let result = content
         .lines()
@@ -33,7 +34,7 @@ fn get_template_lines(path: &str) -> Result<Vec<String>, Error> {
     Ok(result)
 }
 
-fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Error> {
+fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
     for template in templates {
         let equal = check_file_header(&file, &template)?;
         // println!("EQ: {} | {} | {}", equal, file, template);
@@ -46,7 +47,7 @@ fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Error> 
     Ok(false)
 }
 
-fn check_file_header(file: &str, template: &str) -> Result<bool, Error> {
+fn check_file_header(file: &str, template: &str) -> Result<bool, Box<dyn Error>> {
     let template_lines = get_template_lines(template)?;
     let file_lines = get_file_header(file, template_lines.len())?;
 
@@ -56,7 +57,7 @@ fn check_file_header(file: &str, template: &str) -> Result<bool, Error> {
     }
 }
 
-fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Error> {
+fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Box<dyn Error>> {
     let input = File::open(path)?;
     let reader = BufReader::new(input);
     let mut result = Vec::new();
