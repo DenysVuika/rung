@@ -1,8 +1,46 @@
+mod utils;
+
 use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::cmp::Ordering;
 use std::error::Error;
+use std::collections::HashMap;
+
+struct TemplateLoader {
+    cache: HashMap<String, String>
+}
+
+impl TemplateLoader {
+    fn new() -> TemplateLoader {
+        TemplateLoader {
+            cache: HashMap::new()
+        }
+    }
+
+    fn get(&mut self, key: &String) -> Result<String, &str> {
+        self.cache.entry(key.to_string()).or_insert_with(|| {
+            println!("Loading template {}", &key);
+            fs::read_to_string(&key).unwrap()
+        });
+
+        match self.cache.get(key) {
+            Some(val) => Ok(val.to_string()),
+            None => Err("Error loading template")
+        }
+    }
+
+    fn get_lines(&mut self, key: &String) -> Result<Vec<String>, Box<dyn Error>> {
+        let content = self.get(key)?;
+
+        let result = content
+            .lines()
+            .map(|line| line.to_string())
+            .collect();
+
+        Ok(result)
+    }
+}
 
 /// Verify that files have headers according to the templates.
 pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
@@ -12,8 +50,10 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
         templates.join(", ")
     );
 
+    let mut loader = TemplateLoader::new();
+
     for file in files {
-        let result = check_file_headers(&file, &templates)?;
+        let result = check_file_headers(&file, &templates, &mut loader)?;
         if result {
             println!("OK: {}", file);
         } else {
@@ -24,8 +64,8 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
     Ok(true)
 }
 
-fn get_template_lines(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
-    let content = fs::read_to_string(path)?;
+fn get_template_lines(path: &str, loader: &mut TemplateLoader) -> Result<Vec<String>, Box<dyn Error>> {
+    let content = &loader.get(&path.to_string())?;
     let result = content
         .lines()
         .map(|line| line.to_string())
@@ -34,9 +74,9 @@ fn get_template_lines(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     Ok(result)
 }
 
-fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
+fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
     for template in templates {
-        let equal = check_file_header(&file, &template)?;
+        let equal = check_file_header(&file, &template, loader)?;
         // println!("EQ: {} | {} | {}", equal, file, template);
 
         if equal {
@@ -47,11 +87,11 @@ fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Box<dyn
     Ok(false)
 }
 
-fn check_file_header(file: &str, template: &str) -> Result<bool, Box<dyn Error>> {
-    let template_lines = get_template_lines(template)?;
+fn check_file_header(file: &str, template: &str, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
+    let template_lines = get_template_lines(template, loader)?;
     let file_lines = get_file_header(file, template_lines.len())?;
 
-    match compare(&template_lines, &file_lines) {
+    match utils::compare(&template_lines, &file_lines) {
         Ordering::Equal => Ok(true),
         _ => Ok(false)
     }
@@ -60,25 +100,11 @@ fn check_file_header(file: &str, template: &str) -> Result<bool, Box<dyn Error>>
 fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Box<dyn Error>> {
     let input = File::open(path)?;
     let reader = BufReader::new(input);
-    let mut result = Vec::new();
-
-    for line in reader.lines().take(size) {
-        result.push(line?);
-    }
+    let result = reader
+        .lines()
+        .take(size)
+        .map(|item| item.unwrap())
+        .collect();
 
     Ok(result)
-}
-
-fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
-    let mut iter_b = b.iter();
-    for v in a {
-        match iter_b.next() {
-            Some(w) => match v.cmp(w) {
-                Ordering::Equal => continue,
-                ord => return ord,
-            },
-            None => break,
-        }
-    }
-    return a.len().cmp(&b.len());
 }
