@@ -45,7 +45,7 @@ fn main() {
                     let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
                     let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
 
-                    check_headers(files, templates);
+                    check_headers(&files, &templates).unwrap();
                 },
                 _ => unreachable!()
             }

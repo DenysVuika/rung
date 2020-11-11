@@ -1,19 +1,26 @@
 use std::fs;
 use std::fs::File;
 use std::io::{BufRead, Error, BufReader};
+use std::cmp::Ordering;
 
 /// Verify that files have headers according to the templates.
-pub fn check_headers(files: Vec<&str>, templates: Vec<&str>) {
+pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn std::error::Error>> {
     println!(
         "checking headers of `{}` with templates `{}`",
         files.join(", "),
         templates.join(", ")
     );
 
-    println!(
-        "result: {}",
-        check_file_header(files[0], templates[0]).unwrap()
-    );
+    for file in files {
+        let result = check_file_headers(&file, &templates)?;
+        if result {
+            println!("OK: {}", file);
+        } else {
+            eprintln!("Error: `{}` has invalid header", file);
+        }
+    }
+
+    Ok(true)
 }
 
 fn get_template_lines(path: &str) -> Result<Vec<String>, Error> {
@@ -26,12 +33,25 @@ fn get_template_lines(path: &str) -> Result<Vec<String>, Error> {
     Ok(result)
 }
 
-fn check_file_header(file: &str, template: &str) -> Result<bool, Error> {
-    let template = get_template_lines(template)?;
-    let lines = get_file_header(file, template.len())?;
+fn check_file_headers(file: &str, templates: &Vec<&str>) -> Result<bool, Error> {
+    for template in templates {
+        let equal = check_file_header(&file, &template)?;
+        // println!("EQ: {} | {} | {}", equal, file, template);
 
-    match compare(&template, &lines) {
-        std::cmp::Ordering::Equal => Ok(true),
+        if equal {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+fn check_file_header(file: &str, template: &str) -> Result<bool, Error> {
+    let template_lines = get_template_lines(template)?;
+    let file_lines = get_file_header(file, template_lines.len())?;
+
+    match compare(&template_lines, &file_lines) {
+        Ordering::Equal => Ok(true),
         _ => Ok(false)
     }
 }
@@ -48,12 +68,12 @@ fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Error> {
     Ok(result)
 }
 
-fn compare<T: Ord>(a: &[T], b: &[T]) -> std::cmp::Ordering {
+fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
     let mut iter_b = b.iter();
     for v in a {
         match iter_b.next() {
             Some(w) => match v.cmp(w) {
-                std::cmp::Ordering::Equal => continue,
+                Ordering::Equal => continue,
                 ord => return ord,
             },
             None => break,
