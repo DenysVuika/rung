@@ -1,4 +1,5 @@
 use clap::{App, Arg, AppSettings};
+use rung::check_headers;
 
 fn main() {
     let matches = App::new("rung")
@@ -44,11 +45,7 @@ fn main() {
                     let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
                     let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
 
-                    println!(
-                        "checking headers of `{}` with templates `{}`",
-                        files.join(", "),
-                        templates.join(", ")
-                    );
+                    check_headers(files, templates);
                 },
                 _ => unreachable!()
             }
