@@ -15,12 +15,22 @@ fn main() {
                         .about("validates the file header matches the template")
                         .arg(
                             Arg::new("file")
-                                .about("input file to validate")
+                                .about("input file(s) to validate")
+                                .long("file")
+                                .short('f')
+                                .value_name("FILE")
+                                .takes_value(true)
+                                .multiple(true)
                                 .required(true)
                         )
                         .arg(
                             Arg::new("template")
-                                .about("header template")
+                                .about("header template(s) to use for validation")
+                                .long("template")
+                                .short('t')
+                                .value_name("TEMPLATE")
+                                .takes_value(true)
+                                .multiple(true)
                                 .required(true)
                         )
                 )
@@ -31,11 +41,14 @@ fn main() {
         Some(("check", check_matches)) => {
             match check_matches.subcommand() {
                 Some(("header", header_matches)) => {
-                  println!(
-                      "checking header of {} with template {}",
-                      header_matches.value_of("file").unwrap(),
-                      header_matches.value_of("template").unwrap()
-                  );
+                    let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
+                    let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
+
+                    println!(
+                        "checking headers of `{}` with templates `{}`",
+                        files.join(", "),
+                        templates.join(", ")
+                    );
                 },
                 _ => unreachable!()
             }
