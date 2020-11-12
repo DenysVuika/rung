@@ -30,8 +30,8 @@ impl TemplateLoader {
         }
     }
 
-    fn get_lines(&mut self, key: &String) -> Result<Vec<String>, Box<dyn Error>> {
-        let content = self.get(key)?;
+    fn get_lines(&mut self, key: &str) -> Result<Vec<String>, &str> {
+        let content = self.get(&key.to_string())?;
 
         let result = content
             .lines()
@@ -64,16 +64,6 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
     Ok(true)
 }
 
-fn get_template_lines(path: &str, loader: &mut TemplateLoader) -> Result<Vec<String>, Box<dyn Error>> {
-    let content = &loader.get(&path.to_string())?;
-    let result = content
-        .lines()
-        .map(|line| line.to_string())
-        .collect();
-
-    Ok(result)
-}
-
 fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
     for template in templates {
         let equal = check_file_header(&file, &template, loader)?;
@@ -88,7 +78,7 @@ fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLo
 }
 
 fn check_file_header(file: &str, template: &str, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
-    let template_lines = get_template_lines(template, loader)?;
+    let template_lines = loader.get_lines(&template)?;
     let file_lines = get_file_header(file, template_lines.len())?;
 
     match utils::compare(&template_lines, &file_lines) {
