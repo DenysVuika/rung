@@ -5,12 +5,13 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::cmp::Ordering;
 use std::error::Error;
+use log::{info,error};
 
 use templates::TemplateLoader;
 
 /// Verify that files have headers according to the templates.
 pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
-    println!(
+    info!(
         "checking headers of `{}` with templates `{}`",
         files.join(", "),
         templates.join(", ")
@@ -21,9 +22,9 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
     for file in files {
         let result = check_file_headers(&file, &templates, &mut loader)?;
         if result {
-            println!("OK: {}", file);
+            info!("OK: {}", file);
         } else {
-            eprintln!("Error: `{}` has invalid header", file);
+            error!("Invalid header: {}", file);
         }
     }
 
@@ -33,7 +34,7 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
 fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
     for template in templates {
         let equal = check_file_header(&file, &template, loader)?;
-        // println!("EQ: {} | {} | {}", equal, file, template);
+        // debug!("EQ: {} | {} | {}", equal, file, template);
 
         if equal {
             return Ok(true);

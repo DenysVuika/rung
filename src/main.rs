@@ -1,7 +1,11 @@
+mod logger;
+
 use clap::{App, Arg, AppSettings};
 use rung::check_headers;
 
 fn main() {
+    logger::init_logger();
+
     let matches = App::new("rung")
         .version("0.1.0")
         .author("Denys Vuika <denys.vuika@gmail.com>")
