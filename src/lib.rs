@@ -1,46 +1,12 @@
 mod utils;
+mod templates;
 
-use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::cmp::Ordering;
 use std::error::Error;
-use std::collections::HashMap;
 
-struct TemplateLoader {
-    cache: HashMap<String, String>
-}
-
-impl TemplateLoader {
-    fn new() -> TemplateLoader {
-        TemplateLoader {
-            cache: HashMap::new()
-        }
-    }
-
-    fn get(&mut self, key: &String) -> Result<String, &str> {
-        self.cache.entry(key.to_string()).or_insert_with(|| {
-            println!("Loading template {}", &key);
-            fs::read_to_string(&key).unwrap()
-        });
-
-        match self.cache.get(key) {
-            Some(val) => Ok(val.to_string()),
-            None => Err("Error loading template")
-        }
-    }
-
-    fn get_lines(&mut self, key: &str) -> Result<Vec<String>, &str> {
-        let content = self.get(&key.to_string())?;
-
-        let result = content
-            .lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        Ok(result)
-    }
-}
+use templates::TemplateLoader;
 
 /// Verify that files have headers according to the templates.
 pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
