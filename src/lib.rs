@@ -4,41 +4,53 @@ mod utils;
 use log::{error, info};
 use std::cmp::Ordering;
 use std::error::Error;
+use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use templates::TemplateManager;
 
+/// Verifies that all files exist
+pub fn verify_files(paths: &Vec<&str>) -> bool {
+    paths.iter().all(|path| fs::metadata(path).is_ok())
+}
+
 /// Verify that files have headers according to the templates.
-pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
+pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
     info!(
         "checking headers of `{}` with templates `{}`",
         files.join(", "),
         templates.join(", ")
     );
 
+    if !verify_files(&files) {
+        let error = "One of the input files missing";
+        error!("{}", error);
+        return Some(false);
+    }
+
+    if !verify_files(&templates) {
+        let error = "One of the templates is missing";
+        error!("{}", error);
+        return Some(false);
+    }
+
     let mut loader = TemplateManager::new();
 
-    // let template = match loader.get("missing") {
-    //     Ok(content) => content,
-    //     Err(err) => {
-    //         error!("{}", err);
-    //         std::process::exit(1);
-    //     }
-    // };
-    //
-    // println!("{}", template);
-
     for file in files {
-        let result = check_file_headers(&file, &templates, &mut loader)?;
+        let result = match check_file_headers(&file, &templates, &mut loader) {
+            Ok(val) => val,
+            _ => false,
+        };
         if result {
             info!("OK: {}", file);
         } else {
             error!("Invalid header: {}", file);
+            return None;
         }
     }
 
-    Ok(true)
+    Some(true)
 }
 
 fn check_file_headers(
@@ -86,4 +98,9 @@ fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Box<dyn Error
         .collect();
 
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 }

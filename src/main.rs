@@ -1,6 +1,7 @@
 mod logger;
 
 use clap::{App, AppSettings, Arg};
+use log::{error, info};
 use rung::check_headers;
 
 fn main() {
@@ -48,7 +49,20 @@ fn main() {
                 let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
                 let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
 
-                check_headers(&files, &templates).unwrap();
+                match check_headers(&files, &templates) {
+                    Some(val) => {
+                        if val {
+                            info!("checks succeeded");
+                        } else {
+                            error!("{}", "check failed");
+                            std::process::exit(1);
+                        }
+                    }
+                    None => {
+                        error!("{}", "check failed");
+                        std::process::exit(1);
+                    }
+                }
             }
             _ => unreachable!(),
         },
