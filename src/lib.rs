@@ -19,6 +19,16 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
 
     let mut loader = TemplateLoader::new();
 
+    let template = match loader.get("missing") {
+        Ok(content) => content,
+        Err(err) => {
+            error!("{}", err);
+            std::process::exit(1);
+        }
+    };
+
+    println!("{}", template);
+
     for file in files {
         let result = check_file_headers(&file, &templates, &mut loader)?;
         if result {
