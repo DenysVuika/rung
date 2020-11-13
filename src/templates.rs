@@ -98,7 +98,7 @@ mod tests {
     }
 
     #[test]
-    fn gets_template_from_loader() {
+    fn returns_template_from_loader() {
         let loader = TestLoader::new("test template");
         let expected = String::from("test template");
 
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn get_multiple_lines() {
+    fn returns_multiple_lines() {
         let loader = TestLoader::new("test\ntemplate");
         let content = TemplateManager::with_loader(loader)
             .get_lines("test.txt")
