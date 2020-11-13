@@ -1,13 +1,13 @@
-mod utils;
 mod templates;
+mod utils;
 
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use log::{error, info};
 use std::cmp::Ordering;
 use std::error::Error;
-use log::{info,error};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
-use templates::TemplateLoader;
+use templates::TemplateManager;
 
 /// Verify that files have headers according to the templates.
 pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, Box<dyn Error>> {
@@ -17,17 +17,17 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
         templates.join(", ")
     );
 
-    let mut loader = TemplateLoader::new();
+    let mut loader = TemplateManager::new();
 
-    let template = match loader.get("missing") {
-        Ok(content) => content,
-        Err(err) => {
-            error!("{}", err);
-            std::process::exit(1);
-        }
-    };
-
-    println!("{}", template);
+    // let template = match loader.get("missing") {
+    //     Ok(content) => content,
+    //     Err(err) => {
+    //         error!("{}", err);
+    //         std::process::exit(1);
+    //     }
+    // };
+    //
+    // println!("{}", template);
 
     for file in files {
         let result = check_file_headers(&file, &templates, &mut loader)?;
@@ -41,7 +41,11 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Result<bool, B
     Ok(true)
 }
 
-fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
+fn check_file_headers(
+    file: &str,
+    templates: &Vec<&str>,
+    loader: &mut TemplateManager,
+) -> Result<bool, Box<dyn Error>> {
     for template in templates {
         let equal = check_file_header(&file, &template, loader)?;
         // debug!("EQ: {} | {} | {}", equal, file, template);
@@ -54,13 +58,17 @@ fn check_file_headers(file: &str, templates: &Vec<&str>, loader: &mut TemplateLo
     Ok(false)
 }
 
-fn check_file_header(file: &str, template: &str, loader: &mut TemplateLoader) -> Result<bool, Box<dyn Error>> {
+fn check_file_header(
+    file: &str,
+    template: &str,
+    loader: &mut TemplateManager,
+) -> Result<bool, Box<dyn Error>> {
     let template_lines = loader.get_lines(&template)?;
     let file_lines = get_file_header(file, template_lines.len())?;
 
     match utils::compare(&template_lines, &file_lines) {
         Ordering::Equal => Ok(true),
-        _ => Ok(false)
+        _ => Ok(false),
     }
 }
 
