@@ -1,6 +1,6 @@
 mod logger;
 
-use clap::{App, Arg, AppSettings};
+use clap::{App, AppSettings, Arg};
 use rung::check_headers;
 
 fn main() {
@@ -26,7 +26,7 @@ fn main() {
                                 .value_name("FILE")
                                 .takes_value(true)
                                 .multiple(true)
-                                .required(true)
+                                .required(true),
                         )
                         .arg(
                             Arg::new("template")
@@ -36,25 +36,23 @@ fn main() {
                                 .value_name("TEMPLATE")
                                 .takes_value(true)
                                 .multiple(true)
-                                .required(true)
-                        )
-                )
+                                .required(true),
+                        ),
+                ),
         )
         .get_matches();
 
     match matches.subcommand() {
-        Some(("check", check_matches)) => {
-            match check_matches.subcommand() {
-                Some(("header", header_matches)) => {
-                    let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
-                    let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
+        Some(("check", check_matches)) => match check_matches.subcommand() {
+            Some(("header", header_matches)) => {
+                let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
+                let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
 
-                    check_headers(&files, &templates).unwrap();
-                },
-                _ => unreachable!()
+                check_headers(&files, &templates).unwrap();
             }
+            _ => unreachable!(),
         },
         None => println!("No subcommand was used."),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }

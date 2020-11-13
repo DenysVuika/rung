@@ -1,4 +1,7 @@
-use env_logger::{Env, Builder, Target, fmt::{Color, Style, StyledValue, Formatter}};
+use env_logger::{
+    fmt::{Color, Formatter, Style, StyledValue},
+    Builder, Env, Target,
+};
 use log::{Level, Record};
 use std::io::Write;
 
@@ -21,18 +24,11 @@ fn custom_formatter(buf: &mut Formatter, record: &Record) -> std::io::Result<()>
         style.set_color(Color::Red); //.set_bold(true);
     }
 
-    writeln!(
-        buf,
-        "[{}] - {}",
-        level,
-        style.value(record.args())
-    )
+    writeln!(buf, "[{}] - {}", level, style.value(record.args()))
 }
 
 pub fn init_logger() {
-    Builder::from_env(
-        Env::default()
-            .filter_or("LOG", "trace"))
+    Builder::from_env(Env::default().filter_or("LOG", "trace"))
         .target(Target::Stdout)
         .format(custom_formatter)
         .init();
