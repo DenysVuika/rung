@@ -45,7 +45,7 @@ impl TemplateManager {
 
     /// Creates a new instance with a specific loader
     #[allow(dead_code)]
-    pub fn with_loader<'a>(loader: Box<dyn TemplateLoader>) -> TemplateManager {
+    pub fn with_loader(loader: Box<dyn TemplateLoader>) -> TemplateManager {
         TemplateManager {
             cache: HashMap::new(),
             loader,
@@ -53,26 +53,25 @@ impl TemplateManager {
     }
 
     /// Gets content from the cache or file
-    pub fn get(&mut self, key: &str) -> Result<String, &str> {
+    pub fn get(&mut self, key: &str) -> Option<&String> {
         let loader = &self.loader;
 
         self.cache
             .entry(key.to_string())
             .or_insert_with(|| loader.load(&key.to_string()));
 
-        match self.cache.get(key) {
-            Some(val) => Ok(val.to_string()),
-            None => Err("Error loading template"),
-        }
+        self.cache.get(key)
     }
 
     /// Gets content as a vector of strings from the cache or file
-    pub fn get_lines(&mut self, key: &str) -> Result<Vec<String>, &str> {
-        let content = &self.get(key)?;
-
-        let result = content.lines().map(|line| line.to_string()).collect();
-
-        Ok(result)
+    pub fn get_lines(&mut self, key: &str) -> Option<Vec<String>> {
+        match &self.get(key) {
+            Some(content) => {
+                let result = content.lines().map(|line| line.to_string()).collect();
+                return Some(result);
+            }
+            None => None,
+        }
     }
 }
 
@@ -100,15 +99,19 @@ mod tests {
 
     #[test]
     fn gets_template_from_loader() {
-        let content = TemplateManager::with_loader(TestLoader::new("test template"))
-            .get("test.txt")
-            .unwrap();
-        assert_eq!(content, "test template".to_string());
+        let loader = TestLoader::new("test template");
+        let expected = String::from("test template");
+
+        assert_eq!(
+            TemplateManager::with_loader(loader).get("test.txt"),
+            Some(&expected)
+        );
     }
 
     #[test]
     fn get_multiple_lines() {
-        let content = TemplateManager::with_loader(TestLoader::new("test\ntemplate"))
+        let loader = TestLoader::new("test\ntemplate");
+        let content = TemplateManager::with_loader(loader)
             .get_lines("test.txt")
             .unwrap();
 

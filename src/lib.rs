@@ -63,7 +63,11 @@ fn check_file_header(
     template: &str,
     loader: &mut TemplateManager,
 ) -> Result<bool, Box<dyn Error>> {
-    let template_lines = loader.get_lines(&template)?;
+    let template_lines = match loader.get_lines(&template) {
+        Some(lines) => lines,
+        None => Vec::new(),
+    };
+
     let file_lines = get_file_header(file, template_lines.len())?;
 
     match utils::compare(&template_lines, &file_lines) {
