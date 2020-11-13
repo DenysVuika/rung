@@ -1,5 +1,4 @@
 use log::{error, info};
-use std::cell::Cell;
 use std::collections::HashMap;
 use std::fs;
 
@@ -29,30 +28,6 @@ impl TemplateLoader for FileLoader {
     }
 }
 
-pub struct TestLoader {
-    content: String,
-    // load_calls: u32,
-    load_calls: Cell<u32>,
-}
-
-impl TestLoader {
-    #[allow(dead_code)]
-    fn new(content: &str) -> Box<TestLoader> {
-        Box::new(TestLoader {
-            content: content.to_string(),
-            // load_calls: 0,
-            load_calls: Cell::new(0),
-        })
-    }
-}
-
-impl TemplateLoader for TestLoader {
-    fn load(&self, _path: &str) -> String {
-        self.load_calls.set(self.load_calls.get() + 1);
-        String::from(&self.content)
-    }
-}
-
 /// Provides template loading and caching utilities
 pub struct TemplateManager {
     cache: HashMap<String, String>,
@@ -70,7 +45,7 @@ impl TemplateManager {
 
     /// Creates a new instance with a specific loader
     #[allow(dead_code)]
-    pub fn with_loader(loader: Box<dyn TemplateLoader>) -> TemplateManager {
+    pub fn with_loader<'a>(loader: Box<dyn TemplateLoader>) -> TemplateManager {
         TemplateManager {
             cache: HashMap::new(),
             loader,
@@ -80,6 +55,7 @@ impl TemplateManager {
     /// Gets content from the cache or file
     pub fn get(&mut self, key: &str) -> Result<String, &str> {
         let loader = &self.loader;
+
         self.cache
             .entry(key.to_string())
             .or_insert_with(|| loader.load(&key.to_string()));
@@ -104,6 +80,24 @@ impl TemplateManager {
 mod tests {
     use super::*;
 
+    pub struct TestLoader {
+        content: String,
+    }
+
+    impl TestLoader {
+        fn new(content: &str) -> Box<TestLoader> {
+            Box::new(TestLoader {
+                content: content.to_string(),
+            })
+        }
+    }
+
+    impl TemplateLoader for TestLoader {
+        fn load(&self, _path: &str) -> String {
+            String::from(&self.content)
+        }
+    }
+
     #[test]
     fn gets_template_from_loader() {
         let content = TemplateManager::with_loader(TestLoader::new("test template"))
@@ -112,18 +106,14 @@ mod tests {
         assert_eq!(content, "test template".to_string());
     }
 
-    /*
     #[test]
-    fn loads_template_only_once() {
-        let loader = TestLoader::new("test template");
-        let mut manager = TemplateManager::with_loader(loader);
+    fn get_multiple_lines() {
+        let content = TemplateManager::with_loader(TestLoader::new("test\ntemplate"))
+            .get_lines("test.txt")
+            .unwrap();
 
-        manager.get("test.txt");
-        manager.get("test.txt");
-        manager.get("test.txt");
-
-        // assert_eq!(1, loader.load_calls.get());
+        assert_eq!(2, content.len());
+        assert_eq!("test", content[0]);
+        assert_eq!("template", content[1]);
     }
-
-     */
 }
