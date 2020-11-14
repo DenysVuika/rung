@@ -12,7 +12,13 @@ use templates::TemplateManager;
 
 /// Verifies that all files exist
 pub fn verify_files(paths: &Vec<&str>) -> bool {
-    paths.iter().all(|path| fs::metadata(path).is_ok())
+    paths.iter().all(|path| {
+        let exists = fs::metadata(path).is_ok();
+        if !exists {
+            error!("`{}` not found", path);
+        }
+        exists
+    })
 }
 
 /// Verify that files have headers according to the templates.
@@ -36,6 +42,7 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
     }
 
     let mut loader = TemplateManager::new();
+    let mut validation_result = true;
 
     for file in files {
         let result = match check_file_headers(&file, &templates, &mut loader) {
@@ -46,11 +53,11 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
             info!("OK: {}", file);
         } else {
             error!("Invalid header: {}", file);
-            return None;
+            validation_result = false;
         }
     }
 
-    Some(true)
+    Some(validation_result)
 }
 
 fn check_file_headers(
