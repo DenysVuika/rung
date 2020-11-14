@@ -8,7 +8,7 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-use templates::TemplateManager;
+pub use templates::TemplateManager;
 
 /// Verifies that all files exist
 pub fn verify_files(paths: &Vec<&str>) -> bool {
@@ -107,7 +107,9 @@ fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Box<dyn Error
     Ok(result)
 }
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
 }
+*/
