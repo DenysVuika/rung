@@ -26,8 +26,7 @@ pub fn get_top_lines(path: &Path, size: usize) -> Vec<String> {
             return vec![];
         }
     };
-    let reader = BufReader::new(input);
-    reader
+    BufReader::new(input)
         .lines()
         .take(size)
         .map(|item| item.unwrap())
