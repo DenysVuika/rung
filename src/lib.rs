@@ -3,7 +3,6 @@ mod utils;
 
 use log::{error, info};
 use std::cmp::Ordering;
-use std::error::Error;
 use std::fs;
 
 use std::path::Path;
@@ -40,11 +39,7 @@ pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> Option<bool>
 
     for file in files {
         let file_path = Path::new(file);
-        let result = match check_file_headers(file_path, &templates, &mut loader) {
-            Ok(val) => val,
-            _ => false,
-        };
-
+        let result = check_file_headers(file_path, &templates, &mut loader);
         let file_path = file_path.to_str().unwrap();
 
         if result {
@@ -58,38 +53,30 @@ pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> Option<bool>
     Some(validation_result)
 }
 
-fn check_file_headers(
-    file: &Path,
-    templates: &Vec<&Path>,
-    loader: &mut TemplateManager,
-) -> Result<bool, Box<dyn Error>> {
+fn check_file_headers(file: &Path, templates: &Vec<&Path>, loader: &mut TemplateManager) -> bool {
     for template in templates {
-        let equal = check_file_header(&file, template, loader)?;
+        let equal = check_file_header(&file, template, loader);
         // debug!("EQ: {} | {} | {}", equal, file, template);
 
         if equal {
-            return Ok(true);
+            return true;
         }
     }
 
-    Ok(false)
+    false
 }
 
-fn check_file_header(
-    file: &Path,
-    template: &Path,
-    loader: &mut TemplateManager,
-) -> Result<bool, Box<dyn Error>> {
+fn check_file_header(file: &Path, template: &Path, loader: &mut TemplateManager) -> bool {
     let template_lines = match loader.get_lines(&template) {
         Some(lines) => lines,
         None => Vec::new(),
     };
 
-    let file_lines = get_top_lines(file, template_lines.len())?;
+    let file_lines = get_top_lines(file, template_lines.len());
 
     match utils::compare(&template_lines, &file_lines) {
-        Ordering::Equal => Ok(true),
-        _ => Ok(false),
+        Ordering::Equal => true,
+        _ => false,
     }
 }
 
