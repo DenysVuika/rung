@@ -11,24 +11,18 @@ pub use templates::TemplateManager;
 pub use utils::get_top_lines;
 
 /// Verifies that all files exist
-pub fn verify_files(paths: &Vec<&str>) -> bool {
+pub fn verify_files(paths: &Vec<&Path>) -> bool {
     paths.iter().all(|path| {
         let exists = fs::metadata(path).is_ok();
         if !exists {
-            error!("`{}` not found", path);
+            error!("`{}` not found", path.to_str().unwrap());
         }
         exists
     })
 }
 
 /// Verify that files have headers according to the templates.
-pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
-    info!(
-        "checking headers of `{}` with templates `{}`",
-        files.join(", "),
-        templates.join(", ")
-    );
-
+pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> Option<bool> {
     if !verify_files(&files) {
         let error = "One of the input files missing";
         error!("{}", error);
@@ -50,10 +44,13 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
             Ok(val) => val,
             _ => false,
         };
+
+        let file_path = file_path.to_str().unwrap();
+
         if result {
-            info!("OK: {}", file);
+            info!("OK: {}", file_path);
         } else {
-            error!("Invalid header: {}", file);
+            error!("Invalid header: {}", file_path);
             validation_result = false;
         }
     }
@@ -63,12 +60,11 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
 
 fn check_file_headers(
     file: &Path,
-    templates: &Vec<&str>,
+    templates: &Vec<&Path>,
     loader: &mut TemplateManager,
 ) -> Result<bool, Box<dyn Error>> {
     for template in templates {
-        let template_path = Path::new(template);
-        let equal = check_file_header(&file, template_path, loader)?;
+        let equal = check_file_header(&file, template, loader)?;
         // debug!("EQ: {} | {} | {}", equal, file, template);
 
         if equal {

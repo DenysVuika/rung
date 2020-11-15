@@ -3,6 +3,7 @@ mod logger;
 use clap::{App, AppSettings, Arg};
 use log::{error, info};
 use rung::check_headers;
+use std::path::Path;
 
 fn main() {
     logger::init_logger();
@@ -46,8 +47,16 @@ fn main() {
     match matches.subcommand() {
         Some(("check", check_matches)) => match check_matches.subcommand() {
             Some(("header", header_matches)) => {
-                let files: Vec<_> = header_matches.values_of("file").unwrap().collect();
-                let templates: Vec<_> = header_matches.values_of("template").unwrap().collect();
+                let files: Vec<_> = header_matches
+                    .values_of("file")
+                    .unwrap()
+                    .map(|path| Path::new(path))
+                    .collect();
+                let templates: Vec<_> = header_matches
+                    .values_of("template")
+                    .unwrap()
+                    .map(|path| Path::new(path))
+                    .collect();
 
                 match check_headers(&files, &templates) {
                     Some(val) => {
