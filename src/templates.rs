@@ -69,10 +69,7 @@ impl TemplateManager {
     /// Gets content as a vector of strings from the cache or file
     pub fn get_lines(&mut self, key: &Path) -> Option<Vec<String>> {
         match &self.get(key) {
-            Some(content) => {
-                let result = content.lines().map(|line| line.to_string()).collect();
-                return Some(result);
-            }
+            Some(content) => Some(content.lines().map(|line| line.to_string()).collect()),
             None => None,
         }
     }
