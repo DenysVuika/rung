@@ -1,4 +1,8 @@
 use std::cmp::Ordering;
+use std::error::Error;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::Path;
 
 pub fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
     let mut iter_b = b.iter();
@@ -12,6 +16,18 @@ pub fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
         }
     }
     return a.len().cmp(&b.len());
+}
+
+pub fn get_top_lines(path: &Path, size: usize) -> Result<Vec<String>, Box<dyn Error>> {
+    let input = File::open(path)?;
+    let reader = BufReader::new(input);
+    let result = reader
+        .lines()
+        .take(size)
+        .map(|item| item.unwrap())
+        .collect();
+
+    Ok(result)
 }
 
 #[cfg(test)]

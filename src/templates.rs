@@ -1,9 +1,10 @@
 use log::{error, info};
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 
 pub trait TemplateLoader {
-    fn load(&self, path: &str) -> String;
+    fn load(&self, path: &Path) -> String;
 }
 
 pub struct FileLoader {}
@@ -15,13 +16,14 @@ impl FileLoader {
 }
 
 impl TemplateLoader for FileLoader {
-    fn load(&self, path: &str) -> String {
-        info!("Loading template {}", &path);
+    fn load(&self, path: &Path) -> String {
+        let path_str = &path.to_str().unwrap();
+        info!("Loading template {}", path_str);
 
         match fs::read_to_string(&path) {
             Ok(content) => content,
             Err(err) => {
-                error!("Error loading `{}`. {}", &path, err);
+                error!("Error loading `{}`. {}", path_str, err);
                 String::new()
             }
         }
@@ -53,18 +55,19 @@ impl TemplateManager {
     }
 
     /// Gets content from the cache or file
-    pub fn get(&mut self, key: &str) -> Option<&String> {
+    pub fn get(&mut self, key: &Path) -> Option<&String> {
         let loader = &self.loader;
+        let file_path = String::from(key.to_str().unwrap());
 
         self.cache
-            .entry(key.to_string())
-            .or_insert_with(|| loader.load(&key.to_string()));
+            .entry(file_path)
+            .or_insert_with(|| loader.load(&key));
 
-        self.cache.get(key)
+        self.cache.get(&String::from(key.to_str().unwrap()))
     }
 
     /// Gets content as a vector of strings from the cache or file
-    pub fn get_lines(&mut self, key: &str) -> Option<Vec<String>> {
+    pub fn get_lines(&mut self, key: &Path) -> Option<Vec<String>> {
         match &self.get(key) {
             Some(content) => {
                 let result = content.lines().map(|line| line.to_string()).collect();
@@ -92,7 +95,7 @@ mod tests {
     }
 
     impl TemplateLoader for TestLoader {
-        fn load(&self, _path: &str) -> String {
+        fn load(&self, _path: &Path) -> String {
             String::from(&self.content)
         }
     }
@@ -103,7 +106,7 @@ mod tests {
         let expected = String::from("test template");
 
         assert_eq!(
-            TemplateManager::with_loader(loader).get("test.txt"),
+            TemplateManager::with_loader(loader).get(Path::new("test.txt")),
             Some(&expected)
         );
     }
@@ -112,7 +115,7 @@ mod tests {
     fn returns_multiple_lines() {
         let loader = TestLoader::new("test\ntemplate");
         let content = TemplateManager::with_loader(loader)
-            .get_lines("test.txt")
+            .get_lines(Path::new("test.txt"))
             .unwrap();
 
         assert_eq!(2, content.len());

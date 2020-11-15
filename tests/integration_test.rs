@@ -1,6 +1,5 @@
-use rung::{verify_files, TemplateManager};
+use rung::verify_files;
 use std::error::Error;
-use std::io::Write;
 use tempfile::NamedTempFile;
 
 mod common;
@@ -54,26 +53,6 @@ fn should_validate_multiple_files() -> Result<(), Box<dyn Error>> {
 
     file1.close()?;
     file2.close()?;
-
-    Ok(())
-}
-
-#[test]
-fn should_load_template_from_file() -> Result<(), Box<dyn Error>> {
-    common::setup();
-
-    let mut file = NamedTempFile::new()?;
-    write!(file, "hello\nworld")?;
-
-    let file_path = file.path().to_str().unwrap();
-    let mut template_manager = TemplateManager::new();
-
-    let content = template_manager.get(file_path);
-    let expected = String::from("hello\nworld");
-
-    assert_eq!(Some(&expected), content);
-
-    file.close()?;
 
     Ok(())
 }

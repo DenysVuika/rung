@@ -5,10 +5,10 @@ use log::{error, info};
 use std::cmp::Ordering;
 use std::error::Error;
 use std::fs;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 
+use std::path::Path;
 pub use templates::TemplateManager;
+pub use utils::get_top_lines;
 
 /// Verifies that all files exist
 pub fn verify_files(paths: &Vec<&str>) -> bool {
@@ -45,7 +45,8 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
     let mut validation_result = true;
 
     for file in files {
-        let result = match check_file_headers(&file, &templates, &mut loader) {
+        let file_path = Path::new(file);
+        let result = match check_file_headers(file_path, &templates, &mut loader) {
             Ok(val) => val,
             _ => false,
         };
@@ -61,12 +62,13 @@ pub fn check_headers(files: &Vec<&str>, templates: &Vec<&str>) -> Option<bool> {
 }
 
 fn check_file_headers(
-    file: &str,
+    file: &Path,
     templates: &Vec<&str>,
     loader: &mut TemplateManager,
 ) -> Result<bool, Box<dyn Error>> {
     for template in templates {
-        let equal = check_file_header(&file, &template, loader)?;
+        let template_path = Path::new(template);
+        let equal = check_file_header(&file, template_path, loader)?;
         // debug!("EQ: {} | {} | {}", equal, file, template);
 
         if equal {
@@ -78,8 +80,8 @@ fn check_file_headers(
 }
 
 fn check_file_header(
-    file: &str,
-    template: &str,
+    file: &Path,
+    template: &Path,
     loader: &mut TemplateManager,
 ) -> Result<bool, Box<dyn Error>> {
     let template_lines = match loader.get_lines(&template) {
@@ -87,24 +89,12 @@ fn check_file_header(
         None => Vec::new(),
     };
 
-    let file_lines = get_file_header(file, template_lines.len())?;
+    let file_lines = get_top_lines(file, template_lines.len())?;
 
     match utils::compare(&template_lines, &file_lines) {
         Ordering::Equal => Ok(true),
         _ => Ok(false),
     }
-}
-
-fn get_file_header(path: &str, size: usize) -> Result<Vec<String>, Box<dyn Error>> {
-    let input = File::open(path)?;
-    let reader = BufReader::new(input);
-    let result = reader
-        .lines()
-        .take(size)
-        .map(|item| item.unwrap())
-        .collect();
-
-    Ok(result)
 }
 
 /*
