@@ -4,6 +4,7 @@ use clap::{App, AppSettings, Arg};
 use log::{error, info};
 use rung::check_headers;
 use std::path::Path;
+use std::process;
 
 fn main() {
     logger::init_logger();
@@ -58,19 +59,13 @@ fn main() {
                     .map(|path| Path::new(path))
                     .collect();
 
-                match check_headers(&files, &templates) {
-                    Some(val) => {
-                        if val {
-                            info!("checks succeeded");
-                        } else {
-                            error!("{}", "check failed");
-                            std::process::exit(1);
-                        }
-                    }
-                    None => {
-                        error!("{}", "check failed");
-                        std::process::exit(1);
-                    }
+                let result = check_headers(&files, &templates);
+                if result {
+                    info!("Validation succeeded");
+                    process::exit(0);
+                } else {
+                    error!("Validation failed");
+                    process::exit(1);
                 }
             }
             _ => unreachable!(),

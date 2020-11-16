@@ -1,7 +1,7 @@
 mod templates;
 mod utils;
 
-use log::{error, info};
+use log::error;
 use std::cmp::Ordering;
 
 use std::path::Path;
@@ -19,33 +19,29 @@ pub fn verify_files(paths: &Vec<&Path>) -> bool {
     })
 }
 
-/// Verify that files have headers according to the templates.
-pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> Option<bool> {
+/// Verify that files have headers matching one of the templates.
+pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> bool {
     if !verify_files(&files) {
-        return Some(false);
+        return false;
     }
 
     if !verify_files(&templates) {
-        return Some(false);
+        return false;
     }
 
     let mut loader = TemplateManager::new();
     let mut validation_result = true;
 
     for file in files {
-        let file_path = Path::new(file);
-        let result = check_file_headers(file_path, &templates, &mut loader);
-        let file_path = file_path.to_str().unwrap();
-
-        if result {
-            info!("OK: {}", file_path);
-        } else {
+        let result = check_file_headers(file, &templates, &mut loader);
+        if !result {
+            let file_path = file.to_str().unwrap();
             error!("Invalid header: {}", file_path);
             validation_result = false;
         }
     }
 
-    Some(validation_result)
+    validation_result
 }
 
 fn check_file_headers(file: &Path, templates: &Vec<&Path>, loader: &mut TemplateManager) -> bool {
@@ -60,10 +56,3 @@ fn check_file_headers(file: &Path, templates: &Vec<&Path>, loader: &mut Template
 
     false
 }
-
-/*
-#[cfg(test)]
-mod tests {
-    use super::*;
-}
-*/
