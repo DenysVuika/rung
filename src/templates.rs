@@ -67,10 +67,10 @@ impl TemplateManager {
     }
 
     /// Gets content as a vector of strings from the cache or file
-    pub fn get_lines(&mut self, key: &Path) -> Option<Vec<String>> {
+    pub fn get_lines(&mut self, key: &Path) -> Vec<String> {
         match &self.get(key) {
-            Some(content) => Some(content.lines().map(|line| line.to_string()).collect()),
-            None => None,
+            Some(content) => content.lines().map(|line| line.to_string()).collect(),
+            None => Vec::new(),
         }
     }
 }
@@ -111,9 +111,7 @@ mod tests {
     #[test]
     fn returns_multiple_lines() {
         let loader = TestLoader::new("test\ntemplate");
-        let content = TemplateManager::with_loader(loader)
-            .get_lines(Path::new("test.txt"))
-            .unwrap();
+        let content = TemplateManager::with_loader(loader).get_lines(Path::new("test.txt"));
 
         assert_eq!(2, content.len());
         assert_eq!("test", content[0]);
