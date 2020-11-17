@@ -1,10 +1,19 @@
 mod utils;
 
-use log::error;
+use log::{error, info};
 use std::cmp::Ordering;
 
 use std::path::Path;
 pub use utils::{get_lines, get_top_lines, verify_files};
+
+pub fn validate_json(json: &Path, schema: &Path) -> bool {
+    info!(
+        "Validate `{}` with `{}`",
+        json.to_str().unwrap(),
+        schema.to_str().unwrap()
+    );
+    return true;
+}
 
 /// Verify that files have headers matching one of the templates.
 pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> bool {
