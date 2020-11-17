@@ -21,11 +21,13 @@ Examples:
 
 ```shell
 # using multiple templates
-rung check header -f ./example-1.ts.txt \
-  -t ./templates/template-asf.txt \ 
-  -t ./templates/template-mit.txt
+rung check header \
+  -f ./assets/files/example-1.ts.txt \
+  -t ./assets/templates/template-asf.txt \ 
+  -t ./assets/templates/template-mit.txt
   
 # using multiple files and templates
-rung check header -f ./test/example-* \
-  -t ./test/template-*
+rung check header \
+  -f ./assets/files/* \
+  -t ./assets/templates/*
 ```

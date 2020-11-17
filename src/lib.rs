@@ -18,10 +18,10 @@ pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> bool {
 
     files
         .iter()
-        .all(|file| check_file_headers(file, &templates))
+        .all(|file| compare_file_headers(file, &templates))
 }
 
-fn check_file_headers(file: &Path, templates: &Vec<&Path>) -> bool {
+fn compare_file_headers(file: &Path, templates: &Vec<&Path>) -> bool {
     for template in templates {
         let template_lines = get_lines(&template);
         let file_lines = get_top_lines(file, template_lines.len());
