@@ -7,6 +7,12 @@ Rust tools for Angular projects
 Verifies that the file(s) header is matching one or multiple templates.
 Typically, used for license header checks in source code files.
 
+Main features:
+
+- single file with multiple templates (matches any single)
+- multiple files with single template 
+- multiple files with multiple templates
+
 ```shell
 rung check header --file <FILE>... --template <TEMPLATE>...
 ```
