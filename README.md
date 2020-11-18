@@ -2,6 +2,35 @@
 
 Rust tools for Angular projects
 
+Commands:
+
+- Check JSON
+- Check Header
+
+## Check JSON
+
+Verifies that the JSON file is valid based on the JSON schema.
+
+Command Format:
+
+```shell
+rung check json --file <FILE> --template <TEMPLATE>
+```
+
+You can get more details with this command:
+
+```shell
+rung check json --help
+```
+
+Examples:
+
+```shell
+run check json \
+  -f ./assets/json/example.json \
+  -t ./assets/json/example.schema.json
+```
+
 ## Check Header
 
 Verifies that the file(s) header is matching one or multiple templates.
@@ -12,6 +41,8 @@ Main features:
 - single file with multiple templates (matches any single)
 - multiple files with single template 
 - multiple files with multiple templates
+
+Command format:
 
 ```shell
 rung check header --file <FILE>... --template <TEMPLATE>...
