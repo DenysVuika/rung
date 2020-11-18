@@ -3,16 +3,16 @@ mod utils;
 use log::{error, info};
 use std::cmp::Ordering;
 
+use anyhow::Result;
 use jsonschema::JSONSchema;
 use serde_json::Value;
-use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
 pub use utils::{get_lines, get_top_lines, verify_files};
 
-pub fn read_json(path: &Path) -> Result<Value, Box<dyn Error>> {
+pub fn read_json(path: &Path) -> Result<Value> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let json_value = serde_json::from_reader(reader)?;

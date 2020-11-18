@@ -1,5 +1,5 @@
+use anyhow::Result;
 use rung::get_top_lines;
-use std::error::Error;
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
@@ -7,7 +7,7 @@ use tempfile::NamedTempFile;
 mod common;
 
 #[test]
-fn should_get_top_lines() -> Result<(), Box<dyn Error>> {
+fn should_get_top_lines() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -23,7 +23,7 @@ fn should_get_top_lines() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn should_not_fail_on_small_files() -> Result<(), Box<dyn Error>> {
+fn should_not_fail_on_small_files() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -40,7 +40,7 @@ fn should_not_fail_on_small_files() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn should_return_empty_array_for_missing_file() -> Result<(), Box<dyn Error>> {
+fn should_return_empty_array_for_missing_file() -> Result<()> {
     common::setup();
 
     let lines = get_top_lines(Path::new("missing.txt"), 2);

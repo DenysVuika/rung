@@ -1,13 +1,12 @@
+use anyhow::Result;
 use rung::{check_headers, read_json, verify_files};
-use std::error::Error;
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
-
 mod common;
 
 #[test]
-fn verifies_file() -> Result<(), Box<dyn Error>> {
+fn verifies_file() -> Result<()> {
     common::setup();
 
     let file = NamedTempFile::new()?;
@@ -20,7 +19,7 @@ fn verifies_file() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_verifying_when_one_file_missing() -> Result<(), Box<dyn Error>> {
+fn fails_verifying_when_one_file_missing() -> Result<()> {
     common::setup();
 
     let file = NamedTempFile::new()?;
@@ -43,7 +42,7 @@ fn fails_to_verify_missing_file() {
 }
 
 #[test]
-fn verifies_multiple_files() -> Result<(), Box<dyn Error>> {
+fn verifies_multiple_files() -> Result<()> {
     common::setup();
 
     let file1 = NamedTempFile::new()?;
@@ -58,7 +57,7 @@ fn verifies_multiple_files() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn passes_single_file_template() -> Result<(), Box<dyn Error>> {
+fn passes_single_file_template() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -76,7 +75,7 @@ fn passes_single_file_template() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn passes_multiple_file_single_template() -> Result<(), Box<dyn Error>> {
+fn passes_multiple_file_single_template() -> Result<()> {
     common::setup();
 
     let mut file1 = NamedTempFile::new()?;
@@ -97,7 +96,7 @@ fn passes_multiple_file_single_template() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_multiple_files_single_template() -> Result<(), Box<dyn Error>> {
+fn fails_multiple_files_single_template() -> Result<()> {
     common::setup();
 
     let mut file1 = NamedTempFile::new()?;
@@ -118,7 +117,7 @@ fn fails_multiple_files_single_template() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_single_file_template() -> Result<(), Box<dyn Error>> {
+fn fails_single_file_template() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -136,7 +135,7 @@ fn fails_single_file_template() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn passes_single_file_multiple_templates() -> Result<(), Box<dyn Error>> {
+fn passes_single_file_multiple_templates() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -160,7 +159,7 @@ fn passes_single_file_multiple_templates() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_single_file_multiple_templates() -> Result<(), Box<dyn Error>> {
+fn fails_single_file_multiple_templates() -> Result<()> {
     common::setup();
 
     let mut file = NamedTempFile::new()?;
@@ -184,7 +183,7 @@ fn fails_single_file_multiple_templates() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn passes_multiple_files_multiple_templates() -> Result<(), Box<dyn Error>> {
+fn passes_multiple_files_multiple_templates() -> Result<()> {
     common::setup();
 
     let mut file1 = NamedTempFile::new()?;
@@ -211,7 +210,7 @@ fn passes_multiple_files_multiple_templates() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_multiple_files_multiple_templates() -> Result<(), Box<dyn Error>> {
+fn fails_multiple_files_multiple_templates() -> Result<()> {
     common::setup();
 
     let mut file1 = NamedTempFile::new()?;
@@ -238,7 +237,7 @@ fn fails_multiple_files_multiple_templates() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn reads_json_from_file() -> Result<(), Box<dyn Error>> {
+fn reads_json_from_file() -> Result<()> {
     common::setup();
 
     let data = r#"
