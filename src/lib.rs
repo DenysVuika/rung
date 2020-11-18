@@ -9,9 +9,10 @@ use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+
 pub use utils::{get_lines, get_top_lines, verify_files};
 
-fn read_json(path: &Path) -> Result<Value, Box<dyn Error>> {
+pub fn read_json(path: &Path) -> Result<Value, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let json_value = serde_json::from_reader(reader)?;
@@ -21,7 +22,7 @@ fn read_json(path: &Path) -> Result<Value, Box<dyn Error>> {
 
 pub fn validate_json(json_path: &Path, schema_path: &Path) -> bool {
     info!(
-        "Validate `{}` with `{}`",
+        "Validating `{}` with `{}`",
         json_path.to_str().unwrap(),
         schema_path.to_str().unwrap()
     );

@@ -1,4 +1,4 @@
-use rung::{check_headers, verify_files};
+use rung::{check_headers, read_json, verify_files};
 use std::error::Error;
 use std::io::Write;
 use std::path::Path;
@@ -233,6 +233,26 @@ fn fails_multiple_files_multiple_templates() -> Result<(), Box<dyn Error>> {
             &vec![template1.path(), template2.path()]
         )
     );
+
+    Ok(())
+}
+
+#[test]
+fn reads_json_from_file() -> Result<(), Box<dyn Error>> {
+    common::setup();
+
+    let data = r#"
+    {
+        "name": "Denys"
+    }
+    "#;
+
+    let mut file = NamedTempFile::new()?;
+    writeln!(file, "{}", data)?;
+
+    let value = read_json(file.path())?;
+
+    assert_eq!("Denys", value["name"]);
 
     Ok(())
 }
