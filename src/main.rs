@@ -98,24 +98,19 @@ fn main() {
                 let template = json_matches.value_of("template").unwrap();
                 let template_path = Path::new(template);
 
-                // match validate_json(file_path, template_path) {
-                //     Ok(..) => {
-                //         info!("Validation succeeded");
-                //         process::exit(0);
-                //     }
-                //     Err(err) => {
-                //         error!("{}", err);
-                //         process::exit(1);
-                //     }
-                // }
-
-                let result = validate_json(file_path, template_path);
-                if result {
-                    info!("Validation succeeded");
-                    process::exit(0);
-                } else {
-                    error!("Validation failed");
-                    process::exit(1);
+                match validate_json(file_path, template_path) {
+                    Ok(true) => {
+                        info!("Validation succeeded");
+                        process::exit(0);
+                    }
+                    Ok(false) => {
+                        info!("Validation failed");
+                        process::exit(1);
+                    }
+                    Err(err) => {
+                        error!("{}", err);
+                        process::exit(1);
+                    }
                 }
             }
             _ => unreachable!(),

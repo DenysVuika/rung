@@ -20,16 +20,16 @@ pub fn read_json(path: &Path) -> Result<Value> {
     Ok(json_value)
 }
 
-pub fn validate_json(json_path: &Path, schema_path: &Path) -> bool {
+pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
     info!(
         "Validating `{}` with `{}`",
         json_path.to_str().unwrap(),
         schema_path.to_str().unwrap()
     );
 
-    let instance = read_json(&json_path).unwrap();
-    let schema = read_json(&schema_path).unwrap();
-    let compiled = JSONSchema::compile(&schema).unwrap();
+    let instance = read_json(&json_path)?;
+    let schema = read_json(&schema_path)?;
+    let compiled = JSONSchema::compile(&schema)?;
     let result = compiled.validate(&instance);
 
     if let Err(errors) = result {
@@ -37,10 +37,10 @@ pub fn validate_json(json_path: &Path, schema_path: &Path) -> bool {
             error!("Validation error: {}", error);
         }
 
-        return false;
+        return Ok(false);
     }
 
-    return true;
+    Ok(true)
 }
 
 /// Verify that files have headers matching one of the templates.
