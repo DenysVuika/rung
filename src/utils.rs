@@ -10,7 +10,7 @@ pub fn verify_files(paths: &[&Path]) -> bool {
     paths.iter().all(|path| {
         let exists = path.exists();
         if !exists {
-            error!("`{}` not found", path.to_str().unwrap());
+            error!("`{}` not found", path.display());
         }
         exists
     })
@@ -37,7 +37,7 @@ pub fn get_top_lines(path: &Path, size: usize) -> Vec<String> {
     let input = match File::open(path) {
         Ok(file) => file,
         Err(_) => {
-            error!("Error opening file {}", path.to_str().unwrap());
+            error!("Error opening file {}", path.display());
             return vec![];
         }
     };
@@ -52,9 +52,7 @@ pub fn get_lines(path: &Path) -> Vec<String> {
     match read_to_string(&path) {
         Ok(content) => content.lines().map(|line| line.to_string()).collect(),
         Err(err) => {
-            let path_str = path.to_str().unwrap();
-
-            error!("Error loading `{}`. {}", path_str, err);
+            error!("Error loading `{}`. {}", path.display(), err);
             vec![]
         }
     }

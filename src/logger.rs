@@ -28,7 +28,7 @@ fn custom_formatter(buf: &mut Formatter, record: &Record) -> std::io::Result<()>
 }
 
 pub fn init_logger() {
-    Builder::from_env(Env::default().filter_or("LOG", "trace"))
+    Builder::from_env(Env::default().filter_or("LOG", "info"))
         .target(Target::Stdout)
         .format(custom_formatter)
         .init();

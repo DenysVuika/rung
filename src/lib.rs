@@ -3,7 +3,7 @@ mod utils;
 use log::{error, info};
 use std::cmp::Ordering;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use jsonschema::JSONSchema;
 use serde_json::Value;
 use std::fs::File;
@@ -13,9 +13,10 @@ use std::path::Path;
 pub use utils::{get_lines, get_top_lines, verify_files};
 
 pub fn read_json(path: &Path) -> Result<Value> {
-    let file = File::open(path)?;
+    let file = File::open(path).context(format!("Error opening file: {}", path.display()))?;
     let reader = BufReader::new(file);
-    let json_value = serde_json::from_reader(reader)?;
+    let json_value = serde_json::from_reader(reader)
+        .context(format!("Error reading from file: {}", path.display()))?;
 
     Ok(json_value)
 }
@@ -23,8 +24,8 @@ pub fn read_json(path: &Path) -> Result<Value> {
 pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
     info!(
         "Validating `{}` with `{}`",
-        json_path.to_str().unwrap(),
-        schema_path.to_str().unwrap()
+        json_path.display(),
+        schema_path.display()
     );
 
     let instance = read_json(&json_path)?;
@@ -70,7 +71,6 @@ fn compare_file_headers(file: &Path, templates: &[&Path]) -> bool {
         }
     }
 
-    let file_path = file.to_str().unwrap();
-    error!("Invalid header: {}", file_path);
+    error!("Invalid header: {}", file.display());
     false
 }

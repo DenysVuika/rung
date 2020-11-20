@@ -7,6 +7,15 @@ Commands:
 - Check JSON
 - Check Header
 
+## Help
+
+Use the `--help` argument to get more details about the program or specific command:
+
+```shell
+rung --help
+rung <command> --help
+```
+
 ## Check JSON
 
 Verifies that the JSON file is valid based on the JSON schema.
