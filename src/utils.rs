@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 /// Verifies that all files exist
-pub fn verify_files(paths: &Vec<&Path>) -> bool {
+pub fn verify_files(paths: &[&Path]) -> bool {
     paths.iter().all(|path| {
         let exists = path.exists();
         if !exists {
@@ -19,6 +19,7 @@ pub fn verify_files(paths: &Vec<&Path>) -> bool {
 // Compares two vectors
 pub fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
     let mut iter_b = b.iter();
+
     for v in a {
         match iter_b.next() {
             Some(w) => match v.cmp(w) {
@@ -28,7 +29,8 @@ pub fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
             None => break,
         }
     }
-    return a.len().cmp(&b.len());
+
+    a.len().cmp(&b.len())
 }
 
 pub fn get_top_lines(path: &Path, size: usize) -> Vec<String> {

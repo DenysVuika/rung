@@ -44,7 +44,7 @@ pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
 }
 
 /// Verify that files have headers matching one of the templates.
-pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> bool {
+pub fn check_headers(files: &[&Path], templates: &[&Path]) -> bool {
     if !verify_files(&files) {
         return false;
     }
@@ -53,12 +53,14 @@ pub fn check_headers(files: &Vec<&Path>, templates: &Vec<&Path>) -> bool {
         return false;
     }
 
-    files
+    let result: bool = files
         .iter()
-        .all(|file| compare_file_headers(file, &templates))
+        .all(|file| compare_file_headers(file, &templates));
+
+    result
 }
 
-fn compare_file_headers(file: &Path, templates: &Vec<&Path>) -> bool {
+fn compare_file_headers(file: &Path, templates: &[&Path]) -> bool {
     for template in templates {
         let template_lines = get_lines(&template);
         let file_lines = get_top_lines(file, template_lines.len());
