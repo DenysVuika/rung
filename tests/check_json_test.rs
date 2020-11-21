@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rung::{read_json, validate_json};
+use rung::check_json::{read_json, validate_json};
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
