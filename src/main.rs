@@ -1,6 +1,6 @@
 mod logger;
 
-use clap::{App, AppSettings, Arg};
+use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
 use log::{error, info};
 use rung::{check_headers, validate_json};
 use std::path::Path;
@@ -9,10 +9,10 @@ use std::process;
 fn main() {
     logger::init_logger();
 
-    let matches = App::new("rung")
-        .version("0.1.0")
-        .author("Denys Vuika <denys.vuika@gmail.com>")
-        .about("Rust tools for Angular projects")
+    let matches = App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!())
+        .about(crate_description!())
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             App::new("check")
@@ -20,7 +20,7 @@ fn main() {
                 .setting(AppSettings::SubcommandRequiredElseHelp)
                 .subcommand(
                     App::new("header")
-                        .version("0.1.0")
+                        .version(crate_version!())
                         .about("Validates that the file(s) header matches the template(s)")
                         .arg(
                             Arg::new("file")
@@ -45,7 +45,7 @@ fn main() {
                 )
                 .subcommand(
                     App::new("json")
-                        .version("0.1.0")
+                        .version(crate_version!())
                         .about("Validates a JSON file matches the JSON Schema file")
                         .arg(
                             Arg::new("file")
