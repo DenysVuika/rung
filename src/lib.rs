@@ -3,7 +3,7 @@ mod utils;
 use log::{error, info};
 use std::cmp::Ordering;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use jsonschema::JSONSchema;
 use serde_json::Value;
 use std::fs::File;
@@ -12,13 +12,29 @@ use std::path::Path;
 
 pub use utils::{get_lines, get_top_lines, verify_files};
 
-pub fn read_json(path: &Path) -> Result<Value> {
-    let file = File::open(path).context(format!("Error opening file: {}", path.display()))?;
-    let reader = BufReader::new(file);
-    let json_value = serde_json::from_reader(reader)
-        .context(format!("Error reading from file: {}", path.display()))?;
+pub fn read_json(path: &Path) -> Option<Value> {
+    if !path.exists() {
+        error!("File not found: {}", path.display());
+        return None;
+    }
 
-    Ok(json_value)
+    let file = match File::open(path) {
+        Ok(file) => file,
+        Err(_) => {
+            error!("Error opening file: {}", path.display());
+            return None;
+        }
+    };
+
+    let reader = BufReader::new(file);
+
+    match serde_json::from_reader(reader) {
+        Ok(value) => Some(value),
+        Err(_) => {
+            error!("Error reading from file: {}", path.display());
+            None
+        }
+    }
 }
 
 pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
@@ -28,8 +44,16 @@ pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
         schema_path.display()
     );
 
-    let instance = read_json(&json_path)?;
-    let schema = read_json(&schema_path)?;
+    let instance = match read_json(&json_path) {
+        Some(value) => value,
+        None => return Ok(false),
+    };
+
+    let schema = match read_json(&schema_path) {
+        Some(value) => value,
+        None => return Ok(false),
+    };
+
     let compiled = JSONSchema::compile(&schema)?;
     let result = compiled.validate(&instance);
 

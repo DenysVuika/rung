@@ -1,6 +1,7 @@
 use anyhow::Result;
 use rung::{read_json, validate_json};
 use std::io::Write;
+use std::path::Path;
 use tempfile::NamedTempFile;
 
 mod common;
@@ -18,7 +19,7 @@ fn reads_json_from_file() -> Result<()> {
     let mut file = NamedTempFile::new()?;
     writeln!(file, "{}", data)?;
 
-    let value = read_json(file.path())?;
+    let value = read_json(file.path()).unwrap();
 
     assert_eq!("Denys", value["name"]);
 
@@ -91,6 +92,23 @@ fn fails_validation() -> Result<()> {
     writeln!(schema_file, "{}", schema_text)?;
 
     assert_eq!(false, validate_json(json_file.path(), schema_file.path())?);
+
+    Ok(())
+}
+
+#[test]
+fn read_json_returns_none_for_missing_file() {
+    let result = read_json(Path::new("missing.json"));
+    assert_eq!(None, result);
+}
+
+#[test]
+fn read_json_returns_none_for_incorrect_content() -> Result<()> {
+    let mut file = NamedTempFile::new()?;
+    writeln!(file, "Not a JSON file at all.")?;
+
+    let result = read_json(file.path());
+    assert_eq!(None, result);
 
     Ok(())
 }
