@@ -70,7 +70,25 @@ fn main() {
         .subcommand(
             App::new("serve")
                 .version(crate_version!())
-                .about("Runs a lightweight web server"),
+                .about("Runs a lightweight web server")
+                .arg(
+                    Arg::new("host")
+                        .about("Host address")
+                        .long("host")
+                        .short('h')
+                        .value_name("HOST")
+                        .takes_value(true)
+                        .default_value("127.0.0.1"),
+                )
+                .arg(
+                    Arg::new("port")
+                        .about("Port number")
+                        .long("port")
+                        .short('p')
+                        .value_name("PORT")
+                        .takes_value(true)
+                        .default_value("8080"),
+                ),
         )
         .get_matches();
 
