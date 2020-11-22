@@ -3,6 +3,7 @@ use clap::{crate_authors, crate_description, crate_name, crate_version, App, App
 mod check_header;
 mod check_json;
 mod logger;
+mod serve;
 mod utils;
 
 fn main() {
@@ -66,6 +67,11 @@ fn main() {
                         ),
                 ),
         )
+        .subcommand(
+            App::new("serve")
+                .version(crate_version!())
+                .about("Runs a lightweight web server"),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -74,6 +80,7 @@ fn main() {
             Some(("json", json_matches)) => check_json::run(json_matches),
             _ => unreachable!(),
         },
+        Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),
         None => println!("No subcommand was used."),
         _ => unreachable!(),
     }
