@@ -2,6 +2,7 @@ use actix_files::{Files, NamedFile};
 use actix_web::http::StatusCode;
 use actix_web::{get, guard, middleware, rt, web, App, HttpResponse, HttpServer, Result};
 use clap::ArgMatches;
+use log::info;
 use std::path::Path;
 
 struct AppState {
@@ -21,15 +22,33 @@ async fn p404(data: web::Data<AppState>) -> Result<NamedFile> {
     Ok(NamedFile::open(file_path)?.set_status_code(StatusCode::NOT_FOUND))
 }
 
+#[derive(Clone)]
+struct ServerOptions {
+    host: String,
+    port: String,
+    root_dir: String,
+}
+
+impl ServerOptions {
+    fn get_addr(&self) -> String {
+        format!("{}:{}", self.host, self.port)
+    }
+}
+
 pub fn run(args: &ArgMatches) -> std::io::Result<()> {
     let mut sys = rt::System::new("server");
 
-    let host = args.value_of("host").unwrap();
-    let port = args.value_of("port").unwrap();
-    let addr = format!("{}:{}", host, port);
+    let options = ServerOptions {
+        host: args.value_of("host").unwrap().to_string(),
+        port: args.value_of("port").unwrap().to_string(),
+        root_dir: args.value_of("dir").unwrap().to_string(),
+    };
 
-    let srv = HttpServer::new(|| {
-        let root_dir = "./assets/web";
+    let addr = options.get_addr();
+
+    let srv = HttpServer::new(move || {
+        let root_dir = &options.root_dir;
+        info!("Serving {}", root_dir);
 
         App::new()
             .data(AppState {
