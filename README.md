@@ -4,6 +4,7 @@ Rust tools for Angular projects
 
 Commands:
 
+- Serve
 - Check JSON
 - Check Header
 
@@ -16,14 +17,45 @@ rung --help
 rung <command> --help
 ```
 
+## Serve
+
+Runs a lightweight web server.
+
+Usage:
+
+```shell
+rung serve [OPTIONS] <dir>
+
+OPTIONS:
+    -h, --host <HOST>    Host address [default: 127.0.0.1]
+    -p, --port <PORT>    Port number [default: 8080]
+```
+
+You can get more details by running the following command: 
+
+```shell
+rung serve --help
+```
+
+Examples:
+
+```shell
+# serves application at http://localhost:8081
+rung serve ./dist/app1 -p 8081
+```
+
 ## Check JSON
 
 Verifies that the JSON file is valid based on the JSON schema.
 
-Command Format:
+Usage:
 
 ```shell
 rung check json --file <FILE> --template <TEMPLATE>
+
+OPTIONS:
+    -f, --file <FILE>            input file to validate
+    -t, --template <TEMPLATE>    template file
 ```
 
 You can get more details with this command:
@@ -51,10 +83,14 @@ Main features:
 - multiple files with single template 
 - multiple files with multiple templates
 
-Command format:
+Usage:
 
 ```shell
 rung check header --file <FILE>... --template <TEMPLATE>...
+
+OPTIONS:
+    -f, --file <FILE>...            input file to validate
+    -t, --template <TEMPLATE>...    template file
 ```
 
 You can get more details with this command:
