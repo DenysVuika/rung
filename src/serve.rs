@@ -1,6 +1,6 @@
 use actix_files::{Files, NamedFile};
 use actix_web::http::StatusCode;
-use actix_web::{get, guard, middleware, rt, web, App, HttpResponse, HttpServer, Result};
+use actix_web::{guard, middleware, rt, web, App, HttpResponse, HttpServer, Result};
 use clap::ArgMatches;
 use log::info;
 use std::path::Path;
