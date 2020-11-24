@@ -1,6 +1,6 @@
-# rung
+# rung: (Ru)st + A(ng)ular
 
-Rust tools for Angular projects
+Various tools for Angular projects written in Rust.
 
 Commands:
 
