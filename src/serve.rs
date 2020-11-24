@@ -41,14 +41,8 @@ impl ServerOptions {
     }
 }
 
-pub fn run(args: &ArgMatches) -> std::io::Result<()> {
+fn serve(options: ServerOptions) -> std::io::Result<()> {
     let mut sys = rt::System::new("server");
-
-    let options = ServerOptions {
-        host: args.value_of("host").unwrap().to_string(),
-        port: args.value_of("port").unwrap().to_string(),
-        root_dir: args.value_of("dir").unwrap().to_string(),
-    };
 
     let addr = options.get_addr();
 
@@ -82,4 +76,14 @@ pub fn run(args: &ArgMatches) -> std::io::Result<()> {
     .run();
 
     sys.block_on(srv)
+}
+
+pub fn run(args: &ArgMatches) -> std::io::Result<()> {
+    let options = ServerOptions {
+        host: args.value_of("host").unwrap().to_string(),
+        port: args.value_of("port").unwrap().to_string(),
+        root_dir: args.value_of("dir").unwrap().to_string(),
+    };
+
+    serve(options)
 }
