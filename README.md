@@ -1,6 +1,6 @@
 # rung: (Ru)st + A(ng)ular
 
-Various tools for Angular projects written in Rust.
+Useful command-line tools for Angular projects written in Rust.
 
 Commands:
 
@@ -113,3 +113,9 @@ rung check header \
   -f ./assets/files/* \
   -t ./assets/templates/*
 ```
+
+## License
+
+Rung is primarily distributed under the terms of the Apache License (Version 2.0).
+
+See [LICENSE](LICENSE) for more details.
