@@ -9,18 +9,6 @@ struct AppState {
     root_dir: String,
 }
 
-/// favicon handler
-#[get("/favicon")]
-async fn favicon(data: web::Data<AppState>) -> Result<NamedFile> {
-    let mut file_path = Path::new(&data.root_dir).join("favicon.svg");
-
-    if !file_path.exists() {
-        file_path = Path::new(&data.root_dir).join("favicon.ico");
-    }
-
-    Ok(NamedFile::open(file_path)?)
-}
-
 /// 404 handler
 async fn p404(data: web::Data<AppState>) -> Result<NamedFile> {
     // let file_path = Path::new(&data.root_dir).join("404.html");
@@ -57,7 +45,6 @@ fn serve(options: ServerOptions) -> std::io::Result<()> {
             .wrap(middleware::Compress::default())
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
-            .service(favicon)
             .service(Files::new("/", &root_dir).index_file("index.html"))
             .default_service(
                 // 404 for GET request
