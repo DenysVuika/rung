@@ -4,11 +4,12 @@ Useful command-line tools for Angular projects written in Rust.
 
 Commands:
 
+- List
 - Serve
 - Check JSON
 - Check Header
 
-## Help
+## Getting Help
 
 Use the `--help` argument to get more details about the program or specific command:
 
@@ -17,7 +18,50 @@ rung --help
 rung <command> --help
 ```
 
-## Serve
+## Commands
+
+### List
+
+Provides listing of the contents of the `angular.json` file.
+
+```shell
+USAGE:
+    rung ls [OPTIONS] [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -c, --config <PATH>    [default: angular.json]
+
+SUBCOMMANDS:
+    apps    List all applications
+    help    Prints this message or the help of the given subcommand(s)
+    libs    List all libraries
+```
+
+Examples:
+
+```shell
+# list all projects and libraries
+rung ls
+
+# list all applications
+rung ls apps
+
+# list all libraries
+rung ls libs
+```
+
+By default, the CLI expects the `angular.json` file to be in the current directory.
+It is also possible to provide a custom path:
+
+```shell
+rung ls libs -c ./assets/angular/angular.json
+```
+
+### Serve
 
 Runs a lightweight web server.
 
@@ -44,7 +88,7 @@ Examples:
 rung serve ./dist/app1 -p 8081
 ```
 
-## Check JSON
+### Check JSON
 
 Verifies that the JSON file is valid based on the JSON schema.
 
@@ -72,7 +116,7 @@ run check json \
   -t ./assets/json/example.schema.json
 ```
 
-## Check Header
+### Check Header
 
 Verifies that the file(s) header is matching one or multiple templates.
 Typically, used for license header checks in source code files.
