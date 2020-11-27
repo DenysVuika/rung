@@ -1,4 +1,9 @@
-use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
+use anyhow::Result;
+use clap::{
+    crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg, ArgMatches,
+};
+use rung::angular;
+use std::path::PathBuf;
 
 mod check_header;
 mod check_json;
@@ -6,7 +11,7 @@ mod logger;
 mod serve;
 mod utils;
 
-fn main() {
+fn main() -> Result<()> {
     logger::init_logger();
 
     let matches = App::new(crate_name!())
@@ -91,6 +96,39 @@ fn main() {
                         .default_value("8080"),
                 ),
         )
+        .subcommand(
+            App::new("ls")
+                .version(crate_version!())
+                .about("List all projects")
+                .arg(
+                    Arg::new("config")
+                        .long("config")
+                        .short('c')
+                        .value_name("PATH")
+                        .takes_value(true)
+                        .default_value("angular.json"),
+                )
+                .subcommand(
+                    App::new("apps").about("List all applications").arg(
+                        Arg::new("config")
+                            .long("config")
+                            .short('c')
+                            .value_name("PATH")
+                            .takes_value(true)
+                            .default_value("angular.json"),
+                    ),
+                )
+                .subcommand(
+                    App::new("libs").about("List all libraries").arg(
+                        Arg::new("config")
+                            .long("config")
+                            .short('c')
+                            .value_name("PATH")
+                            .takes_value(true)
+                            .default_value("angular.json"),
+                    ),
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -100,7 +138,39 @@ fn main() {
             _ => unreachable!(),
         },
         Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),
+        Some(("ls", ls_matches)) => match ls_matches.subcommand() {
+            Some(("apps", apps_matches)) => {
+                let config = get_workspace_config(apps_matches)?;
+                angular::list_projects_by_type(&config, angular::ProjectType::Application)?
+            }
+            Some(("libs", libs_matches)) => {
+                let config = get_workspace_config(libs_matches)?;
+                angular::list_projects_by_type(&config, angular::ProjectType::Library)?
+            }
+            _ => {
+                let config = get_workspace_config(ls_matches)?;
+                angular::list_projects(&config)?;
+            }
+        },
         None => println!("No subcommand was used."),
         _ => unreachable!(),
     }
+
+    Ok(())
+}
+
+fn get_workspace_config(args: &ArgMatches) -> Result<angular::WorkspaceConfig> {
+    let config_path = match args.value_of("config") {
+        Some(value) => {
+            let path = PathBuf::from(value);
+            if path.exists() {
+                path
+            } else {
+                angular::get_config_path()?
+            }
+        }
+        None => angular::get_config_path()?,
+    };
+
+    angular::read_config(config_path)
 }
