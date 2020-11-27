@@ -1,9 +1,6 @@
 use anyhow::Result;
-use clap::{
-    crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg, ArgMatches,
-};
+use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
 use rung::angular;
-use std::path::PathBuf;
 
 mod check_header;
 mod check_json;
@@ -140,15 +137,15 @@ fn main() -> Result<()> {
         Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),
         Some(("ls", ls_matches)) => match ls_matches.subcommand() {
             Some(("apps", apps_matches)) => {
-                let config = get_workspace_config(apps_matches)?;
+                let config = angular::get_workspace_config(apps_matches)?;
                 angular::list_projects_by_type(&config, angular::ProjectType::Application)?
             }
             Some(("libs", libs_matches)) => {
-                let config = get_workspace_config(libs_matches)?;
+                let config = angular::get_workspace_config(libs_matches)?;
                 angular::list_projects_by_type(&config, angular::ProjectType::Library)?
             }
             _ => {
-                let config = get_workspace_config(ls_matches)?;
+                let config = angular::get_workspace_config(ls_matches)?;
                 angular::list_projects(&config)?;
             }
         },
@@ -157,20 +154,4 @@ fn main() -> Result<()> {
     }
 
     Ok(())
-}
-
-fn get_workspace_config(args: &ArgMatches) -> Result<angular::WorkspaceConfig> {
-    let config_path = match args.value_of("config") {
-        Some(value) => {
-            let path = PathBuf::from(value);
-            if path.exists() {
-                path
-            } else {
-                angular::get_config_path()?
-            }
-        }
-        None => angular::get_config_path()?,
-    };
-
-    angular::read_config(config_path)
 }
