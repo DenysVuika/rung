@@ -1,12 +1,52 @@
 use anyhow::Result;
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
 use rung::angular;
+use std::path::PathBuf;
 
 mod check_header;
 mod check_json;
 mod logger;
 mod serve;
 mod utils;
+
+fn angular_config_arg<'a>() -> Arg<'a> {
+    Arg::new("config")
+        .long("config")
+        .short('c')
+        .value_name("PATH")
+        .takes_value(true)
+        .default_value("angular.json")
+}
+
+fn template_arg<'a>() -> Arg<'a> {
+    Arg::new("template")
+        .about("template file")
+        .long("template")
+        .short('t')
+        .value_name("TEMPLATE")
+        .takes_value(true)
+        .multiple(true)
+        .required(true)
+}
+
+fn input_file_arg<'a>() -> Arg<'a> {
+    Arg::new("file")
+        .about("input file")
+        .long("file")
+        .short('f')
+        .value_name("FILE")
+        .takes_value(true)
+        .required(true)
+}
+
+fn directory_arg<'a>() -> Arg<'a> {
+    Arg::new("directory")
+        .about("The directory name to create the workspace in.")
+        .long("directory")
+        .short('d')
+        .value_name("DIR")
+        .takes_value(true)
+}
 
 fn main() -> Result<()> {
     logger::init_logger();
@@ -24,49 +64,15 @@ fn main() -> Result<()> {
                     App::new("header")
                         .version(crate_version!())
                         .about("Validates that the file(s) header matches the template(s)")
-                        .arg(
-                            Arg::new("file")
-                                .about("input file to validate")
-                                .long("file")
-                                .short('f')
-                                .value_name("FILE")
-                                .takes_value(true)
-                                .multiple(true)
-                                .required(true),
-                        )
-                        .arg(
-                            Arg::new("template")
-                                .about("template file")
-                                .long("template")
-                                .short('t')
-                                .value_name("TEMPLATE")
-                                .takes_value(true)
-                                .multiple(true)
-                                .required(true),
-                        ),
+                        .arg(input_file_arg())
+                        .arg(template_arg()),
                 )
                 .subcommand(
                     App::new("json")
                         .version(crate_version!())
                         .about("Validates a JSON file matches the JSON Schema file")
-                        .arg(
-                            Arg::new("file")
-                                .about("input file to validate")
-                                .long("file")
-                                .short('f')
-                                .value_name("FILE")
-                                .takes_value(true)
-                                .required(true),
-                        )
-                        .arg(
-                            Arg::new("template")
-                                .about("template file")
-                                .long("template")
-                                .short('t')
-                                .value_name("TEMPLATE")
-                                .takes_value(true)
-                                .required(true),
-                        ),
+                        .arg(input_file_arg())
+                        .arg(template_arg()),
                 ),
         )
         .subcommand(
@@ -97,34 +103,29 @@ fn main() -> Result<()> {
             App::new("ls")
                 .version(crate_version!())
                 .about("List all projects")
-                .arg(
-                    Arg::new("config")
-                        .long("config")
-                        .short('c')
-                        .value_name("PATH")
-                        .takes_value(true)
-                        .default_value("angular.json"),
+                .arg(angular_config_arg())
+                .subcommand(
+                    App::new("apps")
+                        .about("List all applications")
+                        .arg(angular_config_arg()),
                 )
                 .subcommand(
-                    App::new("apps").about("List all applications").arg(
-                        Arg::new("config")
-                            .long("config")
-                            .short('c')
-                            .value_name("PATH")
-                            .takes_value(true)
-                            .default_value("angular.json"),
-                    ),
-                )
-                .subcommand(
-                    App::new("libs").about("List all libraries").arg(
-                        Arg::new("config")
-                            .long("config")
-                            .short('c')
-                            .value_name("PATH")
-                            .takes_value(true)
-                            .default_value("angular.json"),
-                    ),
+                    App::new("libs")
+                        .about("List all libraries")
+                        .arg(angular_config_arg()),
                 ),
+        )
+        .subcommand(
+            App::new("new")
+                .version(crate_version!())
+                .about("Creates a new workspace and an initial Angular application.")
+                .arg(
+                    Arg::new("name")
+                        .about("The name of the new workspace and initial project.")
+                        .required(true)
+                        .index(1),
+                )
+                .arg(directory_arg()),
         )
         .get_matches();
 
@@ -149,6 +150,14 @@ fn main() -> Result<()> {
                 angular::list_projects(&config)?;
             }
         },
+        Some(("new", new_matches)) => {
+            let name = new_matches.value_of("name").unwrap();
+            let path = match new_matches.value_of("directory") {
+                Some(value) => PathBuf::from(value),
+                None => std::env::current_dir()?,
+            };
+            angular::new_application(name, &path)?;
+        }
         None => println!("No subcommand was used."),
         _ => unreachable!(),
     }

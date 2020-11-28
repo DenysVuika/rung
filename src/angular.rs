@@ -1,10 +1,13 @@
 use anyhow::Result;
 use clap::ArgMatches;
+use log::info;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;
+
+use crate::utils;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -117,4 +120,15 @@ pub fn list_projects_by_type(config: &WorkspaceConfig, project_type: ProjectType
     }
 
     Ok(())
+}
+
+pub fn new_application(name: &str, dir: &PathBuf) -> Result<bool> {
+    info!("Creating new workspace: {}", name);
+
+    std::fs::create_dir_all(dir)?;
+
+    let args = &["new", name, "--skip-install", "--skip-git"];
+    let result = utils::exec_command(dir, "ng", args);
+
+    Ok(result)
 }
