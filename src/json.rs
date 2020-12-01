@@ -1,35 +1,14 @@
+//! JSON utils
+
 use anyhow::Result;
-use clap::ArgMatches;
 use jsonschema::JSONSchema;
 use log::{error, info};
 use serde_json::Value;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use std::process;
 
-pub fn run(args: &ArgMatches) {
-    let file = args.value_of("file").unwrap();
-    let file_path = Path::new(file);
-    let template = args.value_of("template").unwrap();
-    let template_path = Path::new(template);
-
-    match validate_json(file_path, template_path) {
-        Ok(true) => {
-            info!("Validation succeeded");
-            process::exit(0);
-        }
-        Ok(false) => {
-            info!("Validation failed");
-            process::exit(1);
-        }
-        Err(err) => {
-            error!("{}", err);
-            process::exit(1);
-        }
-    }
-}
-
+/// Reads and parses JSON from file
 pub fn read_json(path: &Path) -> Option<Value> {
     if !path.exists() {
         error!("File not found: {}", path.display());
@@ -55,6 +34,7 @@ pub fn read_json(path: &Path) -> Option<Value> {
     }
 }
 
+/// Validates JSON file with the JSON Schema file
 pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
     info!(
         "Validating `{}` with `{}`",

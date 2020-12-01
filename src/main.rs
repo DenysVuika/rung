@@ -132,7 +132,7 @@ fn main() -> Result<()> {
     match matches.subcommand() {
         Some(("check", check_matches)) => match check_matches.subcommand() {
             Some(("header", header_matches)) => files::run_header_check(header_matches),
-            Some(("json", json_matches)) => json::run(json_matches),
+            Some(("json", json_matches)) => rung::validate_json(json_matches),
             _ => unreachable!(),
         },
         Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),

@@ -1,3 +1,5 @@
+//! Logging utils
+
 use env_logger::{
     fmt::{Color, Formatter, Style, StyledValue},
     Builder, Env, Target,
