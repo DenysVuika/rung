@@ -5,7 +5,6 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 /// Executes a shell command
-#[allow(dead_code)]
 pub fn exec_command(working_dir: &Path, cmd: &str, args: &[&str]) -> bool {
     let mut cli_command = match Command::new(cmd)
         .args(args)

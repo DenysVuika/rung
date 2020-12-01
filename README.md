@@ -5,6 +5,7 @@ Useful command-line tools for Angular projects written in Rust.
 Commands:
 
 - List
+- New Application
 - Serve
 - Check JSON
 - Check Header
@@ -60,6 +61,32 @@ It is also possible to provide a custom path:
 ```shell
 rung ls libs -c ./assets/angular/angular.json
 ```
+
+### New Application
+
+Creates a new Angular application with [Angular CLI].
+
+Requires an [Angular CLI] to be installed.
+
+```shell
+USAGE:
+    rung new [OPTIONS] <name>
+
+ARGS:
+    <name>    The name of the new workspace and initial project.
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -d, --directory <DIR>    The directory name to create the workspace in.
+```
+
+Differences to running `ng new <name>` command directly:
+
+- does not install dependencies automatically by default
+- does not configure Git repository by default
 
 ### Serve
 
@@ -163,3 +190,5 @@ rung check header \
 Rung is primarily distributed under the terms of the Apache License (Version 2.0).
 
 See [LICENSE](LICENSE) for more details.
+
+[Angular CLI]: https://angular.io/cli
