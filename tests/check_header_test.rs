@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rung::check_header::{check_headers, verify_files};
+use rung::files::{check_headers, verify_files};
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;

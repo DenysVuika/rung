@@ -5,7 +5,8 @@
 //! with Angular CLI projects more convenient.
 
 pub mod angular;
-pub mod check_header;
-pub mod check_json;
+pub mod files;
+pub mod json;
+pub mod logger;
 pub mod serve;
 pub mod utils;

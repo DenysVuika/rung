@@ -27,6 +27,7 @@ fn custom_formatter(buf: &mut Formatter, record: &Record) -> std::io::Result<()>
     writeln!(buf, "[{}] - {}", level, style.value(record.args()))
 }
 
+/// Sets up the default logger
 pub fn init_logger() {
     Builder::from_env(Env::default().filter_or("LOG", "info"))
         .target(Target::Stdout)

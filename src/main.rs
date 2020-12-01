@@ -3,8 +3,8 @@ use clap::{crate_authors, crate_description, crate_name, crate_version, App, App
 use rung::angular;
 use std::path::PathBuf;
 
-mod check_header;
-mod check_json;
+mod files;
+mod json;
 mod logger;
 mod serve;
 mod utils;
@@ -131,8 +131,8 @@ fn main() -> Result<()> {
 
     match matches.subcommand() {
         Some(("check", check_matches)) => match check_matches.subcommand() {
-            Some(("header", header_matches)) => check_header::run(header_matches),
-            Some(("json", json_matches)) => check_json::run(json_matches),
+            Some(("header", header_matches)) => files::run_header_check(header_matches),
+            Some(("json", json_matches)) => json::run(json_matches),
             _ => unreachable!(),
         },
         Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),

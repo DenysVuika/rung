@@ -1,3 +1,7 @@
+//! # File utils
+//!
+//! Provides various utilities to work with files.
+
 use crate::utils;
 use clap::ArgMatches;
 use log::{error, info};
@@ -7,7 +11,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process;
 
-pub fn run(args: &ArgMatches) {
+pub fn run_header_check(args: &ArgMatches) {
     let files: Vec<_> = args
         .values_of("file")
         .unwrap()
@@ -29,7 +33,7 @@ pub fn run(args: &ArgMatches) {
     }
 }
 
-/// Verify that files have headers matching one of the templates.
+/// Verifies that files have headers matching one of the templates.
 pub fn check_headers(files: &[&Path], templates: &[&Path]) -> bool {
     if !verify_files(&files) {
         return false;
@@ -71,6 +75,7 @@ pub fn verify_files(paths: &[&Path]) -> bool {
     })
 }
 
+/// Returns certain amount of lines from the top of the file
 pub fn get_top_lines(path: &Path, size: usize) -> Vec<String> {
     let input = match File::open(path) {
         Ok(file) => file,
@@ -86,6 +91,7 @@ pub fn get_top_lines(path: &Path, size: usize) -> Vec<String> {
         .collect()
 }
 
+/// Returns the content of the file as a collection of lines
 pub fn get_lines(path: &Path) -> Vec<String> {
     match read_to_string(&path) {
         Ok(content) => content.lines().map(|line| line.to_string()).collect(),

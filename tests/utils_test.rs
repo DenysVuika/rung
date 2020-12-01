@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rung::check_header::get_top_lines;
+use rung::files::get_top_lines;
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;

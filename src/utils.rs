@@ -1,8 +1,10 @@
+//! Misc utils
+
 use std::cmp::Ordering;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-/// Executes shell command
+/// Executes a shell command
 #[allow(dead_code)]
 pub fn exec_command(working_dir: &Path, cmd: &str, args: &[&str]) -> bool {
     let mut cli_command = match Command::new(cmd)
@@ -20,7 +22,7 @@ pub fn exec_command(working_dir: &Path, cmd: &str, args: &[&str]) -> bool {
     cli_command.wait().unwrap().success()
 }
 
-// Compares two vectors
+/// Compares two vectors
 pub fn compare<T: Ord>(a: &[T], b: &[T]) -> Ordering {
     let mut iter_b = b.iter();
 

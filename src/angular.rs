@@ -1,4 +1,4 @@
-//! # Angular
+//! # Angular utils
 //!
 //! Provides a collection of utilities to work with Angular configuration.
 
