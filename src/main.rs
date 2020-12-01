@@ -131,22 +131,22 @@ fn main() -> Result<()> {
 
     match matches.subcommand() {
         Some(("check", check_matches)) => match check_matches.subcommand() {
-            Some(("header", header_matches)) => files::run_header_check(header_matches),
+            Some(("header", header_matches)) => rung::check_files_headers(header_matches),
             Some(("json", json_matches)) => rung::validate_json(json_matches),
             _ => unreachable!(),
         },
         Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),
         Some(("ls", ls_matches)) => match ls_matches.subcommand() {
             Some(("apps", apps_matches)) => {
-                let config = angular::get_workspace_config(apps_matches)?;
+                let config = rung::get_workspace_config(apps_matches)?;
                 angular::list_projects_by_type(&config, angular::ProjectType::Application)?
             }
             Some(("libs", libs_matches)) => {
-                let config = angular::get_workspace_config(libs_matches)?;
+                let config = rung::get_workspace_config(libs_matches)?;
                 angular::list_projects_by_type(&config, angular::ProjectType::Library)?
             }
             _ => {
-                let config = angular::get_workspace_config(ls_matches)?;
+                let config = rung::get_workspace_config(ls_matches)?;
                 angular::list_projects(&config)?;
             }
         },

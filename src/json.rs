@@ -35,7 +35,7 @@ pub fn read_json(path: &Path) -> Option<Value> {
 }
 
 /// Validates JSON file with the JSON Schema file
-pub fn validate_json(json_path: &Path, schema_path: &Path) -> Result<bool> {
+pub fn validate_with_schema(json_path: &Path, schema_path: &Path) -> Result<bool> {
     info!(
         "Validating `{}` with `{}`",
         json_path.display(),

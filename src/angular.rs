@@ -3,7 +3,6 @@
 //! Provides a collection of utilities to work with Angular configuration.
 
 use anyhow::Result;
-use clap::ArgMatches;
 use log::info;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -106,22 +105,6 @@ pub fn list_projects(config: &WorkspaceConfig) -> Result<()> {
     }
 
     Ok(())
-}
-
-/// Gets the path to the workspace configuration file from the CLI command args
-pub fn get_config_path(args: &ArgMatches) -> Result<PathBuf> {
-    let config_path = match args.value_of("config") {
-        Some(value) => PathBuf::from(value),
-        None => std::env::current_dir()?.join("angular.json"),
-    };
-
-    Ok(config_path)
-}
-
-/// Load workspace configuration file using CLI args
-pub fn get_workspace_config(args: &ArgMatches) -> Result<WorkspaceConfig> {
-    let config_path = get_config_path(args)?;
-    read_config(config_path)
 }
 
 /// List workspace projects based on a specific type

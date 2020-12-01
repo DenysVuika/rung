@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rung::json::{read_json, validate_json};
+use rung::json::{read_json, validate_with_schema};
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
@@ -56,7 +56,10 @@ fn passes_validation() -> Result<()> {
     let mut schema_file = NamedTempFile::new()?;
     writeln!(schema_file, "{}", schema_text)?;
 
-    assert_eq!(true, validate_json(json_file.path(), schema_file.path())?);
+    assert_eq!(
+        true,
+        validate_with_schema(json_file.path(), schema_file.path())?
+    );
 
     Ok(())
 }
@@ -91,7 +94,10 @@ fn fails_validation() -> Result<()> {
     let mut schema_file = NamedTempFile::new()?;
     writeln!(schema_file, "{}", schema_text)?;
 
-    assert_eq!(false, validate_json(json_file.path(), schema_file.path())?);
+    assert_eq!(
+        false,
+        validate_with_schema(json_file.path(), schema_file.path())?
+    );
 
     Ok(())
 }
