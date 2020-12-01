@@ -1,13 +1,7 @@
 use anyhow::Result;
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
-use rung::angular;
+use rung::{angular, logger, serve};
 use std::path::PathBuf;
-
-mod files;
-mod json;
-mod logger;
-mod serve;
-mod utils;
 
 fn angular_config_arg<'a>() -> Arg<'a> {
     Arg::new("config")
