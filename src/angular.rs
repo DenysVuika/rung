@@ -1,3 +1,7 @@
+//! # Angular
+//!
+//! Provides a collection of utilities to work with Angular configuration.
+
 use anyhow::Result;
 use clap::ArgMatches;
 use log::info;
@@ -9,40 +13,43 @@ use std::path::PathBuf;
 
 use crate::utils;
 
+/// Workspace configuration file
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceConfig {
     #[serde(rename = "$schema")]
-    schema: Option<String>,
+    pub schema: Option<String>,
     /// File format version
-    version: u32,
+    pub version: u32,
     /// Path where new projects will be created.
-    new_project_root: Option<String>,
+    pub new_project_root: Option<String>,
     /// Default project name used in commands.
-    default_project: Option<String>,
-    projects: Option<HashMap<String, Project>>,
-    cli: Option<CliOptions>,
+    pub default_project: Option<String>,
+    pub projects: Option<HashMap<String, Project>>,
+    pub cli: Option<CliOptions>,
     // todo: schematics
 }
 
+/// Workspace project
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Project {
     /// Project type.
-    project_type: ProjectType,
-    cli: Option<CliOptions>,
+    pub project_type: ProjectType,
+    pub cli: Option<CliOptions>,
     /// The prefix to apply to generated selectors.
-    prefix: Option<String>,
+    pub prefix: Option<String>,
     /// Root of the project files.
-    root: Option<String>,
+    pub root: Option<String>,
     /// The root of the source files, assets and index.html file structure.
-    source_root: Option<String>,
+    pub source_root: Option<String>,
     // todo: schematics
     // todo: i18n
     // todo: architect
     // todo: targets
 }
 
+/// Types of the workspace projects
 #[derive(PartialEq, Deserialize, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
@@ -50,25 +57,28 @@ pub enum ProjectType {
     Library,
 }
 
+/// Angular CLI Options
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CliOptions {
     /// The default schematics collection to use.
-    default_collection: Option<String>,
+    pub default_collection: Option<String>,
     /// Specify which package manager tool to use.
-    package_manager: Option<PackageManager>,
+    pub package_manager: Option<PackageManager>,
     /// Control CLI specific console warnings
-    warnings: Option<CliWarnings>,
+    pub warnings: Option<CliWarnings>,
     // todo: analytics
 }
 
+/// Angular CLI Warnings
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CliWarnings {
     /// Show a warning when the global version is newer than the local one.
-    version_mismatch: bool,
+    pub version_mismatch: bool,
 }
 
+/// Types of the supported package managers
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum PackageManager {
@@ -78,6 +88,7 @@ pub enum PackageManager {
     Pnpm,
 }
 
+/// Loads Angular workspace configuration from the file.
 pub fn read_config(path: PathBuf) -> Result<WorkspaceConfig> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
@@ -86,6 +97,7 @@ pub fn read_config(path: PathBuf) -> Result<WorkspaceConfig> {
     Ok(config)
 }
 
+/// Lists the projects within the workspace configuration
 pub fn list_projects(config: &WorkspaceConfig) -> Result<()> {
     let projects = &config.projects.as_ref().unwrap();
 
@@ -96,6 +108,7 @@ pub fn list_projects(config: &WorkspaceConfig) -> Result<()> {
     Ok(())
 }
 
+/// Gets the path to the workspace configuration file from the CLI command args
 pub fn get_config_path(args: &ArgMatches) -> Result<PathBuf> {
     let config_path = match args.value_of("config") {
         Some(value) => PathBuf::from(value),
@@ -105,11 +118,13 @@ pub fn get_config_path(args: &ArgMatches) -> Result<PathBuf> {
     Ok(config_path)
 }
 
+/// Load workspace configuration file using CLI args
 pub fn get_workspace_config(args: &ArgMatches) -> Result<WorkspaceConfig> {
     let config_path = get_config_path(args)?;
     read_config(config_path)
 }
 
+/// List workspace projects based on a specific type
 pub fn list_projects_by_type(config: &WorkspaceConfig, project_type: ProjectType) -> Result<()> {
     let projects = &config.projects.as_ref().unwrap();
 
@@ -122,6 +137,7 @@ pub fn list_projects_by_type(config: &WorkspaceConfig, project_type: ProjectType
     Ok(())
 }
 
+/// Create new Angular application
 pub fn new_application(name: &str, dir: &PathBuf) -> Result<bool> {
     info!("Creating new workspace: {}", name);
 
