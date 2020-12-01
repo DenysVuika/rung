@@ -29,10 +29,6 @@ Provides listing of the contents of the `angular.json` file.
 USAGE:
     rung ls [OPTIONS] [SUBCOMMAND]
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
 OPTIONS:
     -c, --config <PATH>    [default: angular.json]
 
@@ -75,10 +71,6 @@ USAGE:
 ARGS:
     <name>    The name of the new workspace and initial project.
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
 OPTIONS:
     -d, --directory <DIR>    The directory name to create the workspace in.
 ```
@@ -88,24 +80,30 @@ Differences to running `ng new <name>` command directly:
 - does not install dependencies automatically by default
 - does not configure Git repository by default
 
+Examples:
+
+```shell
+# creates new application `app1` in the current directory
+rung new app1
+
+# creates a new application `app2` in the `/tmp/apps` directory 
+rung new app2 -d /tmp/apps 
+```
+
 ### Serve
 
 Runs a lightweight web server.
 
-Usage:
-
 ```shell
-rung serve [OPTIONS] <dir>
+USAGE:
+    rung serve [OPTIONS] <dir>
+
+ARGS:
+    <dir>    Target directory
 
 OPTIONS:
     -h, --host <HOST>    Host address [default: 127.0.0.1]
     -p, --port <PORT>    Port number [default: 8080]
-```
-
-You can get more details by running the following command: 
-
-```shell
-rung serve --help
 ```
 
 Examples:
@@ -129,12 +127,6 @@ OPTIONS:
     -t, --template <TEMPLATE>    template file
 ```
 
-You can get more details with this command:
-
-```shell
-rung check json --help
-```
-
 Examples:
 
 ```shell
@@ -154,20 +146,14 @@ Main features:
 - multiple files with single template 
 - multiple files with multiple templates
 
-Usage:
-
 ```shell
-rung check header --file <FILE>... --template <TEMPLATE>...
+USAGE:
+    rung check header --file <FILE> --template <TEMPLATE>...
 
 OPTIONS:
-    -f, --file <FILE>...            input file to validate
+    -f, --file <FILE>               input file
     -t, --template <TEMPLATE>...    template file
-```
 
-You can get more details with this command:
-
-```shell
-rung check header --help
 ```
 
 Examples:

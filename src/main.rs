@@ -73,7 +73,12 @@ fn main() -> Result<()> {
             App::new("serve")
                 .version(crate_version!())
                 .about("Runs a lightweight web server")
-                .arg(Arg::new("dir").required(true).index(1))
+                .arg(
+                    Arg::new("dir")
+                        .about("Target directory")
+                        .required(true)
+                        .index(1),
+                )
                 .arg(
                     Arg::new("host")
                         .about("Host address")
