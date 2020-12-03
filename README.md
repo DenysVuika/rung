@@ -96,10 +96,13 @@ Runs a lightweight web server.
 
 ```shell
 USAGE:
-    rung serve [OPTIONS] <dir>
+    rung serve [FLAGS] [OPTIONS] <dir>
 
 ARGS:
     <dir>    Target directory
+    
+FLAGS:
+    -o, --open       Opens the url in default browser.
 
 OPTIONS:
     -h, --host <HOST>    Host address [default: 127.0.0.1]
@@ -111,6 +114,9 @@ Examples:
 ```shell
 # serves application at http://localhost:8081
 rung serve ./dist/app1 -p 8081
+
+# serves the application and opens default system browser
+rung serve ./dist/app1 -p 8081 --open
 ```
 
 ### Check JSON

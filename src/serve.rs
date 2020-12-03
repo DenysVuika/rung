@@ -21,11 +21,16 @@ struct ServerOptions {
     host: String,
     port: String,
     root_dir: String,
+    open: bool,
 }
 
 impl ServerOptions {
     fn get_addr(&self) -> String {
         format!("{}:{}", self.host, self.port)
+    }
+
+    fn get_url(&self) -> String {
+        format!("http://{}:{}", self.host, self.port)
     }
 }
 
@@ -33,6 +38,8 @@ fn serve(options: ServerOptions) -> std::io::Result<()> {
     let mut sys = rt::System::new("server");
 
     let addr = options.get_addr();
+    let url = options.get_url();
+    let open = options.open;
 
     let srv = HttpServer::new(move || {
         let root_dir = &options.root_dir;
@@ -62,6 +69,10 @@ fn serve(options: ServerOptions) -> std::io::Result<()> {
     .bind(addr)?
     .run();
 
+    if open {
+        webbrowser::open(url.as_str())?;
+    }
+
     sys.block_on(srv)
 }
 
@@ -70,6 +81,7 @@ pub fn run(args: &ArgMatches) -> std::io::Result<()> {
         host: args.value_of("host").unwrap().to_string(),
         port: args.value_of("port").unwrap().to_string(),
         root_dir: args.value_of("dir").unwrap().to_string(),
+        open: args.is_present("open"),
     };
 
     serve(options)

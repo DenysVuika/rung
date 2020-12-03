@@ -100,7 +100,7 @@ pub fn read_config(path: PathBuf) -> Result<WorkspaceConfig> {
 pub fn list_projects(config: &WorkspaceConfig) -> Result<()> {
     let projects = &config.projects.as_ref().unwrap();
 
-    for (key, value) in projects.into_iter() {
+    for (key, value) in projects.iter() {
         println!("{} ({:?})", key, value.project_type);
     }
 
@@ -111,7 +111,7 @@ pub fn list_projects(config: &WorkspaceConfig) -> Result<()> {
 pub fn list_projects_by_type(config: &WorkspaceConfig, project_type: ProjectType) -> Result<()> {
     let projects = &config.projects.as_ref().unwrap();
 
-    for (key, value) in projects.into_iter() {
+    for (key, value) in projects.iter() {
         if value.project_type == project_type {
             println!("{}", key);
         }

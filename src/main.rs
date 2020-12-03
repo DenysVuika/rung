@@ -81,7 +81,7 @@ fn main() -> Result<()> {
                 )
                 .arg(
                     Arg::new("host")
-                        .about("Host address")
+                        .about("Host to listen on.")
                         .long("host")
                         .short('h')
                         .value_name("HOST")
@@ -90,12 +90,18 @@ fn main() -> Result<()> {
                 )
                 .arg(
                     Arg::new("port")
-                        .about("Port number")
+                        .about("Port to listen on.")
                         .long("port")
                         .short('p')
                         .value_name("PORT")
                         .takes_value(true)
                         .default_value("8080"),
+                )
+                .arg(
+                    Arg::new("open")
+                        .about("Opens the url in default browser.")
+                        .long("open")
+                        .short('o'),
                 ),
         )
         .subcommand(
