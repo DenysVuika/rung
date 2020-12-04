@@ -1,7 +1,6 @@
 use actix_files::{Files, NamedFile};
 use actix_web::http::StatusCode;
 use actix_web::{guard, middleware, rt, web, App, HttpResponse, HttpServer, Result};
-use clap::ArgMatches;
 use log::info;
 use std::path::Path;
 
@@ -17,24 +16,23 @@ async fn p404(data: web::Data<AppState>) -> Result<NamedFile> {
 }
 
 #[derive(Clone)]
-struct ServerOptions {
-    host: String,
-    port: String,
-    root_dir: String,
-    open: bool,
+pub struct ServerOptions {
+    pub host: String,
+    pub port: String,
+    pub root_dir: String,
+    pub open: bool,
 }
 
 impl ServerOptions {
-    fn get_addr(&self) -> String {
+    pub fn get_addr(&self) -> String {
         format!("{}:{}", self.host, self.port)
     }
-
-    fn get_url(&self) -> String {
+    pub fn get_url(&self) -> String {
         format!("http://{}:{}", self.host, self.port)
     }
 }
 
-fn serve(options: ServerOptions) -> std::io::Result<()> {
+pub fn run_server(options: ServerOptions) -> std::io::Result<()> {
     let mut sys = rt::System::new("server");
 
     let addr = options.get_addr();
@@ -74,15 +72,4 @@ fn serve(options: ServerOptions) -> std::io::Result<()> {
     }
 
     sys.block_on(srv)
-}
-
-pub fn run(args: &ArgMatches) -> std::io::Result<()> {
-    let options = ServerOptions {
-        host: args.value_of("host").unwrap().to_string(),
-        port: args.value_of("port").unwrap().to_string(),
-        root_dir: args.value_of("dir").unwrap().to_string(),
-        open: args.is_present("open"),
-    };
-
-    serve(options)
 }

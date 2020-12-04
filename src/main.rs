@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg};
-use rung::{angular, logger, serve};
+use rung::{angular, logger};
 use std::path::PathBuf;
 
 fn angular_config_arg<'a>() -> Arg<'a> {
@@ -140,7 +140,7 @@ fn main() -> Result<()> {
             Some(("json", json_matches)) => rung::validate_json(json_matches),
             _ => unreachable!(),
         },
-        Some(("serve", serve_matches)) => serve::run(serve_matches).unwrap(),
+        Some(("serve", serve_matches)) => rung::serve(serve_matches).unwrap(),
         Some(("ls", ls_matches)) => match ls_matches.subcommand() {
             Some(("apps", apps_matches)) => {
                 let config = rung::get_workspace_config(apps_matches)?;

@@ -70,3 +70,14 @@ pub fn check_files_headers(args: &ArgMatches) {
         process::exit(1);
     }
 }
+
+pub fn serve(args: &ArgMatches) -> std::io::Result<()> {
+    let options = serve::ServerOptions {
+        host: args.value_of("host").unwrap().to_string(),
+        port: args.value_of("port").unwrap().to_string(),
+        root_dir: args.value_of("dir").unwrap().to_string(),
+        open: args.is_present("open"),
+    };
+
+    serve::run_server(options)
+}
