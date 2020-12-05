@@ -1,6 +1,6 @@
 [package]
 name = "rung"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Denys Vuika <denys.vuika@gmail.com>"]
 description = "Useful command-line tools for Angular projects written in Rust."
 keywords = ["angular", "cli"]
